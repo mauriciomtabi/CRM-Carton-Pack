@@ -1,26 +1,26 @@
 import type { Metadata } from 'next'
-import { TrendingUp, Users, DollarSign, AlertTriangle, Package, CheckCircle, XCircle } from 'lucide-react'
+import { TrendingUp, Package, CheckCircle, XCircle, AlertTriangle, ArrowRight } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
+import Link from 'next/link'
 
 export const metadata: Metadata = { title: 'Dashboard — Carton Pack CRM' }
 
-// Mock stats — serão substituídos por dados reais do Supabase
 const stats = [
-  { label: 'Negócios Ativos',   value: '38',          icon: Package,     color: '#9DC814', bg: 'rgba(157,200,20,0.1)'  },
-  { label: 'Fechamentos (mês)', value: 'R$ 87.500',   icon: CheckCircle, color: '#22c55e', bg: 'rgba(34,197,94,0.1)'   },
-  { label: 'Em Negociação',     value: '12',          icon: TrendingUp,  color: '#f59e0b', bg: 'rgba(245,158,11,0.1)'  },
-  { label: 'Perdidos (mês)',    value: 'R$ 23.000',   icon: XCircle,     color: '#ef4444', bg: 'rgba(239,68,68,0.1)'   },
+  { label: 'Negócios Ativos',   value: '38',          icon: Package,     color: 'var(--lime)', bg: 'rgba(180,217,50,0.1)'  },
+  { label: 'Fechamentos (mês)', value: 'R$ 87.500',   icon: CheckCircle, color: 'var(--green)', bg: 'rgba(72,199,103,0.1)'   },
+  { label: 'Em Negociação',     value: '12',          icon: TrendingUp,  color: 'var(--yellow)', bg: 'rgba(240,196,25,0.1)'  },
+  { label: 'Perdidos (mês)',    value: 'R$ 23.000',   icon: XCircle,     color: 'var(--red)', bg: 'rgba(226,72,61,0.1)'   },
 ]
 
 const pipelineSummary = [
-  { stage: 'Leads / Banco',       count: 12, value: null,     color: '#64748b' },
+  { stage: 'Leads / Banco',       count: 12, value: null,     color: '#555555' },
   { stage: 'Prospect',            count: 8,  value: null,     color: '#3b82f6' },
   { stage: 'Dinâmica',            count: 6,  value: null,     color: '#8b5cf6' },
-  { stage: 'Potencial',           count: 5,  value: null,     color: '#f59e0b' },
+  { stage: 'Potencial',           count: 5,  value: null,     color: 'var(--yellow)' },
   { stage: 'Visita',              count: 3,  value: null,     color: '#06b6d4' },
   { stage: 'Briefing/Orçamento',  count: 4,  value: 65000,    color: '#f97316' },
   { stage: 'Aprovação',           count: 2,  value: 38000,    color: '#a855f7' },
-  { stage: 'Fechamento',          count: 3,  value: 87500,    color: '#22c55e' },
+  { stage: 'Fechamento',          count: 3,  value: 87500,    color: 'var(--lime)' },
 ]
 
 const alerts = [
@@ -33,70 +33,62 @@ export default function DashboardPage() {
   const maxCount = Math.max(...pipelineSummary.map(s => s.count))
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1400px' }}>
+    <div className="page-content animate-fade-in max-w-7xl mx-auto">
       {/* Header */}
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text-primary)' }}>
+      <div className="mb-8">
+        <h1 className="font-display text-3xl text-[var(--white)] tracking-tight">
           Dashboard
         </h1>
-        <p style={{ color: 'var(--text-secondary)', marginTop: '4px', fontSize: '14px' }}>
+        <p className="font-mono text-xs text-[var(--gray)] mt-1 uppercase tracking-wider">
           Visão geral do pipeline comercial — Carton Pack
         </p>
       </div>
 
-      {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         {stats.map(({ label, value, icon: Icon, color, bg }) => (
-          <div className="stat-card animate-fade-in" key={label}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div className="stat-card" key={label} style={{ '--stat-color': color } as React.CSSProperties}>
+            <div className="flex items-start justify-between">
               <div>
                 <div className="stat-value" style={{ color }}>{value}</div>
                 <div className="stat-label">{label}</div>
               </div>
-              <div style={{ background: bg, borderRadius: '10px', padding: '10px' }}>
-                <Icon size={20} color={color} />
+              <div className="stat-icon" style={{ background: bg }}>
+                <Icon size={18} color={color} />
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Pipeline Funnel */}
-        <div className="card" style={{ padding: '24px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '20px', color: 'var(--text-primary)' }}>
-            📊 Funil de Vendas
+        <div className="card p-6 lg:col-span-2">
+          <h2 className="font-display text-base mb-6 text-[var(--white)] flex items-center gap-2">
+            <span>📊</span> Funil de Vendas
           </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div className="flex flex-col gap-3">
             {pipelineSummary.map(({ stage, count, value, color }) => (
-              <div key={stage} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '140px', fontSize: '13px', color: 'var(--text-secondary)', flexShrink: 0 }}>
+              <div key={stage} className="flex items-center gap-4">
+                <div className="w-36 text-xs text-[var(--gray)] font-medium truncate">
                   {stage}
                 </div>
-                <div style={{
-                  flex: 1,
-                  height: '28px',
-                  background: 'var(--bg-hover)',
-                  borderRadius: '6px',
-                  overflow: 'hidden',
-                  position: 'relative',
-                }}>
-                  <div style={{
-                    width: `${(count / maxCount) * 100}%`,
-                    height: '100%',
-                    background: color,
-                    borderRadius: '6px',
-                    opacity: 0.85,
-                    display: 'flex',
-                    alignItems: 'center',
-                    paddingLeft: '10px',
-                    transition: 'width 0.6s ease',
-                    minWidth: '36px',
-                  }}>
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: 'white' }}>{count}</span>
+                <div className="flex-1 h-7 bg-[var(--charcoal)] border border-[var(--line)] rounded-md overflow-hidden relative">
+                  <div
+                    className="h-full rounded-md flex items-center pl-3 transition-all duration-500 ease-out"
+                    style={{
+                      width: `${(count / maxCount) * 100}%`,
+                      background: `linear-gradient(90deg, ${color}cc, ${color})`,
+                      boxShadow: color === 'var(--lime)' ? '0 0 12px rgba(180,217,50,0.2)' : 'none',
+                      minWidth: '28px',
+                    }}
+                  >
+                    <span className="font-mono text-xs font-bold text-black">
+                      {count}
+                    </span>
                   </div>
                 </div>
-                <div style={{ width: '100px', textAlign: 'right', fontSize: '12px', color: value ? '#22c55e' : 'var(--text-muted)', fontWeight: 600 }}>
+                <div className="w-24 text-right font-mono text-xs font-bold" style={{ color: value ? 'var(--lime)' : 'var(--gray2)' }}>
                   {value ? formatCurrency(value) : '—'}
                 </div>
               </div>
@@ -104,42 +96,47 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Alerts */}
-        <div className="card" style={{ padding: '24px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <AlertTriangle size={16} color="#f59e0b" />
-            Negócios Parados
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {alerts.map(({ deal, contact, days, stage }) => (
-              <div key={deal} style={{
-                background: 'var(--bg-hover)',
-                borderRadius: '8px',
-                padding: '12px',
-                border: days >= 7 ? '1px solid rgba(239,68,68,0.3)' : '1px solid var(--bg-border)',
-              }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
-                  {deal}
+        {/* Alerts / Stale Deals */}
+        <div className="card p-6 flex flex-col justify-between">
+          <div>
+            <h2 className="font-display text-base mb-4 text-[var(--white)] flex items-center gap-2">
+              <AlertTriangle size={16} className="text-[var(--yellow)]" />
+              Negócios Parados
+            </h2>
+            <div className="flex flex-col gap-3">
+              {alerts.map(({ deal, contact, days, stage }) => (
+                <div
+                  key={deal}
+                  className="bg-[var(--charcoal)] border rounded-lg p-3 transition-all duration-200 hover:border-[var(--line)]"
+                  style={{
+                    borderColor: days >= 7 ? 'rgba(226,72,61,0.25)' : 'var(--line)',
+                  }}
+                >
+                  <div className="text-xs font-bold text-[var(--white)] mb-1">
+                    {deal}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[11px] text-[var(--gray)]">{contact} · {stage}</span>
+                    <span
+                      className="font-mono text-[9px] font-bold px-2 py-0.5 rounded-full"
+                      style={{
+                        color: days >= 7 ? 'var(--red)' : 'var(--yellow)',
+                        background: days >= 7 ? 'rgba(226,72,61,0.1)' : 'rgba(240,196,25,0.1)',
+                        border: `1px solid ${days >= 7 ? 'rgba(226,72,61,0.2)' : 'rgba(240,196,25,0.2)'}`,
+                      }}
+                    >
+                      {days}d parado
+                    </span>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{contact} · {stage}</span>
-                  <span style={{
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    color: days >= 7 ? '#fca5a5' : '#fcd34d',
-                    background: days >= 7 ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.15)',
-                    padding: '2px 8px',
-                    borderRadius: '999px',
-                  }}>
-                    {days}d parado
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-          <a href="/pipeline" className="btn btn-secondary btn-sm" style={{ width: '100%', marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
-            Ver Pipeline Completo
-          </a>
+
+          <Link href="/pipeline" className="btn btn-secondary w-full mt-6 py-2.5 flex items-center justify-center gap-2">
+            <span>Ver Pipeline Completo</span>
+            <ArrowRight size={14} />
+          </Link>
         </div>
       </div>
     </div>

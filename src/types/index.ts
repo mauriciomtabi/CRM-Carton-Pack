@@ -146,16 +146,16 @@ export interface KanbanColumn {
 }
 
 export const STAGE_CONFIG: Record<DealStage, { label: string; color: string; icon: string; showValue: boolean }> = {
-  leads:      { label: 'Leads / Banco',         color: '#64748b', icon: '🎯', showValue: false },
+  leads:      { label: 'Leads / Banco',         color: '#555555', icon: '🎯', showValue: false },
   prospect:   { label: 'Prospect',               color: '#3b82f6', icon: '📡', showValue: false },
   dinamica:   { label: 'Dinâmica',               color: '#8b5cf6', icon: '🔄', showValue: false },
-  potencial:  { label: 'Potencial / Negociação', color: '#f59e0b', icon: '💼', showValue: false },
+  potencial:  { label: 'Potencial / Negociação', color: '#f0c419', icon: '💼', showValue: false },
   visita:     { label: 'Visita',                 color: '#06b6d4', icon: '🚗', showValue: false },
   briefing:   { label: 'Briefing / Orçamento',   color: '#f97316', icon: '📄', showValue: true  },
   aprovacao:  { label: 'Aprovação',              color: '#a855f7', icon: '✅', showValue: true  },
-  fechamento: { label: 'Fechamento',             color: '#22c55e', icon: '🏆', showValue: true  },
-  perdido:    { label: 'Perdidos',               color: '#ef4444', icon: '❌', showValue: true  },
-  pos_venda:  { label: 'Pós-Vendas',             color: '#14b8a6', icon: '🤝', showValue: true  },
+  fechamento: { label: 'Fechamento',             color: '#b4d932', icon: '🏆', showValue: true  },
+  perdido:    { label: 'Perdidos',               color: '#e2483d', icon: '❌', showValue: true  },
+  pos_venda:  { label: 'Pós-Vendas',             color: '#48c767', icon: '🤝', showValue: true  },
 }
 
 export const FOLLOW_UP_LOST_REASONS = [
