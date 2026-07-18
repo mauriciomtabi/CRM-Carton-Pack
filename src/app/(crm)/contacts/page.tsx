@@ -12,11 +12,13 @@ import {
   Plus, 
   X, 
   Send, 
-  CheckCircle,
   FileText,
   Mail,
   HelpCircle,
-  MessageSquare
+  MessageSquare,
+  ShieldCheck,
+  Percent,
+  FileSpreadsheet
 } from 'lucide-react'
 import { whatsappLink, formatCurrency } from '@/lib/utils'
 
@@ -33,6 +35,14 @@ interface MockContact {
   state: string
   status: 'ativo' | 'inativo'
   email?: string
+  // New Fields
+  tradeName?: string
+  registrationStatus?: string
+  mainCnae?: string
+  address?: string
+  taxRegime?: 'MEI' | 'Simples Nacional' | 'Lucro Presumido' | 'Lucro Real'
+  specialSituation?: string
+  specialSituationDate?: string
 }
 
 interface Activity {
@@ -43,14 +53,9 @@ interface Activity {
 }
 
 const MOCK_CONTACTS: MockContact[] = [
-  { id: '1', name: 'Alvaro Ferreira', company: 'Gota Limpa Indústria', cnpj: '12.345.678/0001-90', curve: 'A', representative: 'Ermínio', lastPurchaseDays: 95, phone: '51999999999', city: 'Sapiranga', state: 'RS', status: 'inativo', email: 'alvaro@gotalimpa.com' },
-  { id: '2', name: 'Ana Lima', company: 'Natura Cosméticos', cnpj: '98.765.432/0001-10', curve: 'A', representative: 'Ana Lima', lastPurchaseDays: 15, phone: '11988888888', city: 'São Paulo', state: 'SP', status: 'ativo', email: 'compras@natura.com.br' },
-  { id: '3', name: 'Carlos Mendes', company: 'XP Presentes', cnpj: '11.222.333/0001-44', curve: 'B', representative: 'Carlos Mendes', lastPurchaseDays: 30, phone: '21977777777', city: 'Rio de Janeiro', state: 'RJ', status: 'ativo', email: 'carlos@xppresentes.com' },
-  { id: '4', name: 'Fernanda Ramos', company: 'Cosmética Mulher', cnpj: '55.666.777/0001-88', curve: 'C', representative: 'Fernanda R.', lastPurchaseDays: 120, phone: '31966666666', city: 'Belo Horizonte', state: 'MG', status: 'inativo', email: 'comercial@cosmeticamulher.com' },
-  { id: '5', name: 'Gustavo Nogueira', company: 'O Boticário', cnpj: '44.555.666/0001-22', curve: 'A', representative: 'Gustavo N.', lastPurchaseDays: 45, phone: '41955555555', city: 'Curitiba', state: 'PR', status: 'ativo', email: 'gustavo@boticario.com' },
-  { id: '6', name: 'Comercial Renner', company: 'Lojas Renner S.A.', cnpj: '77.888.999/0001-55', curve: 'A', representative: 'Renner Compras', lastPurchaseDays: 5, phone: '51944444444', city: 'Porto Alegre', state: 'RS', status: 'ativo', email: 'compras@renner.com.br' },
-  { id: '7', name: 'Roberto Alves', company: 'Avon Produtos', cnpj: '33.444.555/0001-11', curve: 'B', representative: 'Roberto Alves', lastPurchaseDays: 60, phone: '11933333333', city: 'Cabreúva', state: 'SP', status: 'ativo', email: 'roberto@avon.com' },
-  { id: '8', name: 'Marina Costa', company: 'Vinhos do Sul Ltda', cnpj: '22.333.444/0001-00', curve: 'C', representative: 'Marina Costa', lastPurchaseDays: 10, phone: '54922222222', city: 'Bento Gonçalves', state: 'RS', status: 'ativo', email: 'marina@vinhosdosul.com' },
+  { id: '1', name: 'Alvaro Ferreira', company: 'Gota Limpa Indústria', cnpj: '12.345.678/0001-90', curve: 'A', representative: 'Ermínio', lastPurchaseDays: 95, phone: '51999999999', city: 'Sapiranga', state: 'RS', status: 'inativo', email: 'alvaro@gotalimpa.com', tradeName: 'Gota Limpa', registrationStatus: 'ATIVA', mainCnae: '2061-6/00 - Fabricação de sabões e detergentes sintéticos', address: 'Av. Industrial, 4500 - Bairro Industrial - CEP: 93800-000 - Sapiranga/RS', taxRegime: 'Simples Nacional', specialSituation: 'Nenhuma', specialSituationDate: '-' },
+  { id: '2', name: 'Ana Lima', company: 'Natura Cosméticos', cnpj: '98.765.432/0001-10', curve: 'A', representative: 'Ana Lima', lastPurchaseDays: 15, phone: '11988888888', city: 'São Paulo', state: 'SP', status: 'ativo', email: 'compras@natura.com.br', tradeName: 'Natura', registrationStatus: 'ATIVA', mainCnae: '2063-3/00 - Fabricação de cosméticos, produtos de perfumaria e de higiene pessoal', address: 'Av. Alexandre Colares, 1188 - Parque Anhanguera - CEP: 05106-000 - São Paulo/SP', taxRegime: 'Lucro Real', specialSituation: 'Nenhuma', specialSituationDate: '-' },
+  { id: '3', name: 'Carlos Mendes', company: 'XP Presentes', cnpj: '11.222.333/0001-44', curve: 'B', representative: 'Carlos Mendes', lastPurchaseDays: 30, phone: '21977777777', city: 'Rio de Janeiro', state: 'RJ', status: 'ativo', email: 'carlos@xppresentes.com', tradeName: 'XP Presentes', registrationStatus: 'ATIVA', mainCnae: '4789-0/01 - Comércio varejista de suvenires, bijuterias e artesanatos', address: 'Av. Rio Branco, 156 - Centro - CEP: 20040-003 - Rio de Janeiro/RJ', taxRegime: 'Simples Nacional', specialSituation: 'Nenhuma', specialSituationDate: '-' },
 ]
 
 function formatCnpj(v: string) {
@@ -58,13 +63,30 @@ function formatCnpj(v: string) {
   if (v.length > 14) v = v.substring(0, 14)
   if (v.length <= 2) return v
   if (v.length <= 5) return v.replace(/^(\d{2})(\d)/, '$1.$2')
-  if (v.length <= 8) return v.replace(/^(\d{2})(\d{3})(\d)/, '$1.$2.$3')
-  if (v.length <= 12) return v.replace(/^(\d{2})(\d{3})(\d{3})(\d)/, '$1.$2.$3/$4')
-  return v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d)/, '$1.$2.$3/$4-$5')
+  if (v.length <= 8) return v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+  if (v.length <= 12) return v.replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3/$4')
+  return v.replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, '$1.$2.$3/$4-$5')
 }
 
 function capitalizeString(str: string) {
   return str.toLowerCase().replace(/(^\w|\s\w)/g, m => m.toUpperCase())
+}
+
+// Helper to construct full address
+function buildAddress(d: any) {
+  const parts = []
+  if (d.descricao_tipo_de_logradouro || d.logradouro) {
+    parts.push(`${d.descricao_tipo_de_logradouro || ''} ${d.logradouro || ''}`.trim())
+  }
+  if (d.numero) parts.push(d.numero)
+  if (d.complemento) parts.push(d.complemento)
+  let addr = parts.join(', ')
+  if (d.bairro) addr += ` - ${d.bairro}`
+  if (d.cep) {
+    const formattedCep = d.cep.replace(/^(\d{5})(\d{3})/, '$1-$2')
+    addr += ` - CEP: ${formattedCep}`
+  }
+  return addr
 }
 
 // ─── Contact Drawer Component ──────────────────────────────────
@@ -83,6 +105,7 @@ function ContactDrawer({
   // Form states
   const [name, setName] = useState('')
   const [company, setCompany] = useState('')
+  const [tradeName, setTradeName] = useState('')
   const [cnpj, setCnpj] = useState('')
   const [curve, setCurve] = useState<'A' | 'B' | 'C' | 'D'>('C')
   const [representative, setRepresentative] = useState('')
@@ -91,6 +114,14 @@ function ContactDrawer({
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
   const [status, setStatus] = useState<'ativo' | 'inativo'>('ativo')
+  
+  // Expanded fields
+  const [registrationStatus, setRegistrationStatus] = useState('')
+  const [mainCnae, setMainCnae] = useState('')
+  const [address, setAddress] = useState('')
+  const [taxRegime, setTaxRegime] = useState<'MEI' | 'Simples Nacional' | 'Lucro Presumido' | 'Lucro Real'>('Simples Nacional')
+  const [specialSituation, setSpecialSituation] = useState('')
+  const [specialSituationDate, setSpecialSituationDate] = useState('')
 
   // History states
   const [activities, setActivities] = useState<Activity[]>([])
@@ -102,6 +133,7 @@ function ContactDrawer({
       setIsOpen(true)
       setName(contact.name)
       setCompany(contact.company)
+      setTradeName(contact.tradeName ?? '')
       setCnpj(contact.cnpj)
       setCurve(contact.curve)
       setRepresentative(contact.representative)
@@ -110,8 +142,13 @@ function ContactDrawer({
       setCity(contact.city)
       setState(contact.state)
       setStatus(contact.status)
+      setRegistrationStatus(contact.registrationStatus ?? 'ATIVA')
+      setMainCnae(contact.mainCnae ?? '')
+      setAddress(contact.address ?? '')
+      setTaxRegime(contact.taxRegime ?? 'Simples Nacional')
+      setSpecialSituation(contact.specialSituation ?? 'Nenhuma')
+      setSpecialSituationDate(contact.specialSituationDate ?? '-')
 
-      // Mock contact activities
       setActivities([
         { id: '1', type: 'nota', content: 'Ficha cadastral criada no CRM Carton Pack.', timestamp: '10/07/2026 09:00' },
         { id: '2', type: 'whatsapp', content: 'WhatsApp enviado solicitando retorno sobre proposta de caixas acopladas.', timestamp: '14/07/2026 14:15' },
@@ -128,6 +165,7 @@ function ContactDrawer({
       ...contact,
       name,
       company,
+      tradeName,
       cnpj,
       curve,
       representative,
@@ -135,7 +173,13 @@ function ContactDrawer({
       email,
       city,
       state,
-      status
+      status,
+      registrationStatus,
+      mainCnae,
+      address,
+      taxRegime,
+      specialSituation,
+      specialSituationDate
     })
   }
 
@@ -216,148 +260,248 @@ function ContactDrawer({
           
           {/* TAB 1: GERAL */}
           {activeTab === 'geral' && (
-            <div className="flex flex-col gap-5 animate-fade-in">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Razão Social / Empresa</label>
-                  <div className="relative">
-                    <Building2 size={14} className="absolute text-gray-500" />
-                    <input 
-                      type="text" 
-                      className="input" 
-                      value={company} 
-                      onChange={(e) => setCompany(e.target.value)}
-                      onBlur={handleSaveGeneral}
-                    />
+            <div className="flex flex-col gap-5 animate-fade-in pb-12">
+              
+              {/* Seção: Identificação */}
+              <div>
+                <h3 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3 border-b border-[var(--line)] pb-1">Identificação</h3>
+                <div className="flex flex-col gap-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Razão Social / Empresa</label>
+                      <div className="relative">
+                        <Building2 size={14} className="absolute text-gray-500" />
+                        <input 
+                          type="text" 
+                          className="input" 
+                          value={company} 
+                          onChange={(e) => setCompany(e.target.value)}
+                          onBlur={handleSaveGeneral}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Nome Fantasia</label>
+                      <input 
+                        type="text" 
+                        className="input" 
+                        value={tradeName} 
+                        onChange={(e) => setTradeName(e.target.value)}
+                        onBlur={handleSaveGeneral}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Nome do Responsável</label>
-                  <div className="relative">
-                    <User size={14} className="absolute text-gray-500" />
-                    <input 
-                      type="text" 
-                      className="input" 
-                      value={name} 
-                      onChange={(e) => setName(e.target.value)}
-                      onBlur={handleSaveGeneral}
-                    />
-                  </div>
-                </div>
-              </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Nome do Responsável</label>
+                      <div className="relative">
+                        <User size={14} className="absolute text-gray-500" />
+                        <input 
+                          type="text" 
+                          className="input" 
+                          value={name} 
+                          onChange={(e) => setName(e.target.value)}
+                          onBlur={handleSaveGeneral}
+                        />
+                      </div>
+                    </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">CNPJ</label>
-                  <input 
-                    type="text" 
-                    className="input font-mono" 
-                    value={cnpj} 
-                    onChange={(e) => setCnpj(formatCnpj(e.target.value))}
-                    onBlur={handleSaveGeneral}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Curva ABC</label>
-                  <select 
-                    className="input" 
-                    value={curve} 
-                    onChange={(e) => setCurve(e.target.value as any)}
-                    onBlur={handleSaveGeneral}
-                  >
-                    <option value="A">Curva A</option>
-                    <option value="B">Curva B</option>
-                    <option value="C">Curva C</option>
-                    <option value="D">Curva D</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Telefone (WhatsApp)</label>
-                  <div className="relative">
-                    <Phone size={14} className="absolute text-gray-500" />
-                    <input 
-                      type="text" 
-                      className="input" 
-                      value={phone} 
-                      onChange={(e) => setPhone(e.target.value)}
-                      onBlur={handleSaveGeneral}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">E-mail</label>
-                  <div className="relative">
-                    <Mail size={14} className="absolute text-gray-500" />
-                    <input 
-                      type="email" 
-                      className="input" 
-                      value={email} 
-                      onChange={(e) => setEmail(e.target.value)}
-                      onBlur={handleSaveGeneral}
-                    />
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">CNPJ</label>
+                      <input 
+                        type="text" 
+                        className="input font-mono" 
+                        value={cnpj} 
+                        onChange={(e) => setCnpj(formatCnpj(e.target.value))}
+                        onBlur={handleSaveGeneral}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2 flex flex-col gap-1.5">
-                  <label className="label">Cidade</label>
-                  <div className="relative">
-                    <MapPin size={14} className="absolute text-gray-500" />
-                    <input 
-                      type="text" 
-                      className="input" 
-                      value={city} 
-                      onChange={(e) => setCity(e.target.value)}
-                      onBlur={handleSaveGeneral}
-                    />
+              {/* Seção: Dados Fiscais */}
+              <div>
+                <h3 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3 border-b border-[var(--line)] pb-1">Informações Fiscais</h3>
+                <div className="flex flex-col gap-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Situação Cadastral</label>
+                      <div className="relative">
+                        <ShieldCheck size={14} className="absolute text-gray-500" />
+                        <input 
+                          type="text" 
+                          className="input font-bold" 
+                          style={{ color: registrationStatus === 'ATIVA' ? 'var(--green)' : 'var(--red)' }}
+                          value={registrationStatus} 
+                          onChange={(e) => setRegistrationStatus(e.target.value)}
+                          onBlur={handleSaveGeneral}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Regime Tributário</label>
+                      <div className="relative">
+                        <Percent size={14} className="absolute text-gray-500" />
+                        <select 
+                          className="input" 
+                          value={taxRegime} 
+                          onChange={(e) => setTaxRegime(e.target.value as any)}
+                          onBlur={handleSaveGeneral}
+                        >
+                          <option value="MEI">MEI</option>
+                          <option value="Simples Nacional">Simples Nacional</option>
+                          <option value="Lucro Presumido">Lucro Presumido</option>
+                          <option value="Lucro Real">Lucro Real</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="label">CNAE Principal</label>
+                    <div className="relative">
+                      <FileSpreadsheet size={14} className="absolute text-gray-500" />
+                      <input 
+                        type="text" 
+                        className="input" 
+                        value={mainCnae} 
+                        onChange={(e) => setMainCnae(e.target.value)}
+                        onBlur={handleSaveGeneral}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Situação Especial</label>
+                      <input 
+                        type="text" 
+                        className="input" 
+                        value={specialSituation} 
+                        onChange={(e) => setSpecialSituation(e.target.value)}
+                        onBlur={handleSaveGeneral}
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Data Situação Especial</label>
+                      <input 
+                        type="text" 
+                        className="input" 
+                        value={specialSituationDate} 
+                        onChange={(e) => setSpecialSituationDate(e.target.value)}
+                        onBlur={handleSaveGeneral}
+                      />
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">UF</label>
-                  <input 
-                    type="text" 
-                    maxLength={2}
-                    className="input uppercase text-center" 
-                    value={state} 
-                    onChange={(e) => setState(e.target.value.toUpperCase())}
-                    onBlur={handleSaveGeneral}
-                  />
+              {/* Seção: Endereço e Contato */}
+              <div>
+                <h3 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3 border-b border-[var(--line)] pb-1">Endereço e Contato</h3>
+                <div className="flex flex-col gap-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Telefone (WhatsApp)</label>
+                      <div className="relative">
+                        <Phone size={14} className="absolute text-gray-500" />
+                        <input 
+                          type="text" 
+                          className="input" 
+                          value={phone} 
+                          onChange={(e) => setPhone(e.target.value)}
+                          onBlur={handleSaveGeneral}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">E-mail</label>
+                      <div className="relative">
+                        <Mail size={14} className="absolute text-gray-500" />
+                        <input 
+                          type="email" 
+                          className="input" 
+                          value={email} 
+                          onChange={(e) => setEmail(e.target.value)}
+                          onBlur={handleSaveGeneral}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="label">Endereço Completo</label>
+                    <div className="relative">
+                      <MapPin size={14} className="absolute text-gray-500" />
+                      <input 
+                        type="text" 
+                        className="input text-xs" 
+                        value={address} 
+                        onChange={(e) => setAddress(e.target.value)}
+                        onBlur={handleSaveGeneral}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="col-span-2 flex flex-col gap-1.5">
+                      <label className="label">Cidade</label>
+                      <input 
+                        type="text" 
+                        className="input" 
+                        value={city} 
+                        onChange={(e) => setCity(e.target.value)}
+                        onBlur={handleSaveGeneral}
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">UF</label>
+                      <input 
+                        type="text" 
+                        maxLength={2}
+                        className="input uppercase text-center font-bold font-mono" 
+                        value={state} 
+                        onChange={(e) => setState(e.target.value.toUpperCase())}
+                        onBlur={handleSaveGeneral}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Representante</label>
+                      <input 
+                        type="text" 
+                        className="input" 
+                        value={representative} 
+                        onChange={(e) => setRepresentative(e.target.value)}
+                        onBlur={handleSaveGeneral}
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Status Carteira</label>
+                      <select 
+                        className="input" 
+                        value={status} 
+                        onChange={(e) => setStatus(e.target.value as any)}
+                        onBlur={handleSaveGeneral}
+                      >
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Representante</label>
-                  <input 
-                    type="text" 
-                    className="input" 
-                    value={representative} 
-                    onChange={(e) => setRepresentative(e.target.value)}
-                    onBlur={handleSaveGeneral}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Status Carteira</label>
-                  <select 
-                    className="input" 
-                    value={status} 
-                    onChange={(e) => setStatus(e.target.value as any)}
-                    onBlur={handleSaveGeneral}
-                  >
-                    <option value="ativo">Ativo</option>
-                    <option value="inativo">Inativo</option>
-                  </select>
-                </div>
-              </div>
             </div>
           )}
 
@@ -434,6 +578,7 @@ function NewContactModal({
   // Form fields
   const [name, setName] = useState('')
   const [company, setCompany] = useState('')
+  const [tradeName, setTradeName] = useState('')
   const [cnpj, setCnpj] = useState('')
   const [curve, setCurve] = useState<'A' | 'B' | 'C' | 'D'>('C')
   const [representative, setRepresentative] = useState('Ana Lima')
@@ -441,6 +586,14 @@ function NewContactModal({
   const [email, setEmail] = useState('')
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
+  
+  // Expanded properties states
+  const [registrationStatus, setRegistrationStatus] = useState('ATIVA')
+  const [mainCnae, setMainCnae] = useState('')
+  const [address, setAddress] = useState('')
+  const [taxRegime, setTaxRegime] = useState<'MEI' | 'Simples Nacional' | 'Lucro Presumido' | 'Lucro Real'>('Simples Nacional')
+  const [specialSituation, setSpecialSituation] = useState('Nenhuma')
+  const [specialSituationDate, setSpecialSituationDate] = useState('-')
 
   const handleFetchCnpj = async () => {
     const clean = rawCnpj.replace(/\D/g, '')
@@ -457,14 +610,32 @@ function NewContactModal({
       if (!res.ok) throw new Error('Não encontrado')
       const data = await res.json()
 
-      // Populating fields
-      setCompany(data.nome_fantasia || data.razao_social || '')
+      // Populating standard and expanded fields
+      setCompany(data.razao_social || '')
+      setTradeName(data.nome_fantasia || data.razao_social || '')
       setPhone(data.ddd_telefone_1 || '')
       setEmail(data.email || '')
       setCity(data.municipio ? capitalizeString(data.municipio) : '')
       setState(data.uf || '')
       setCnpj(formatCnpj(clean))
-      setName('') // Stay blank for manual contact person entry as per recommendation
+      
+      // Auto-populate expanded API information
+      setRegistrationStatus(data.descricao_situacao_cadastral || 'ATIVA')
+      setMainCnae(data.cnae_fiscal ? `${data.cnae_fiscal} - ${data.cnae_fiscal_descricao || ''}` : '')
+      setAddress(buildAddress(data))
+      
+      // Determine tax regime dynamically
+      if (data.opcao_pelo_mei) {
+        setTaxRegime('MEI')
+      } else if (data.opcao_pelo_simples) {
+        setTaxRegime('Simples Nacional')
+      } else {
+        setTaxRegime('Lucro Presumido')
+      }
+
+      setSpecialSituation(data.situacao_especial || 'Nenhuma')
+      setSpecialSituationDate(data.data_situacao_especial || '-')
+      setName('') // Stay blank for manual physical person responsible name entry
     } catch (err) {
       setCnpjError('Erro ao buscar CNPJ. CNPJ inexistente ou API fora do ar.')
     } finally {
@@ -478,26 +649,33 @@ function NewContactModal({
     onConfirm({
       name,
       company,
+      tradeName,
       cnpj,
       curve,
       representative,
       phone,
       email,
       city,
-      state
+      state,
+      registrationStatus,
+      mainCnae,
+      address,
+      taxRegime,
+      specialSituation,
+      specialSituationDate
     })
   }
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-      <form onSubmit={handleSubmit} className="bg-[var(--charcoal)] border border-[var(--line)] rounded-2xl p-6 w-full max-w-md shadow-2xl flex flex-col gap-4 animate-fade-up">
+      <form onSubmit={handleSubmit} className="bg-[var(--charcoal)] border border-[var(--line)] rounded-2xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-4 animate-fade-up">
         
         <div>
           <h3 className="font-display text-base text-[var(--white)] font-bold">Cadastrar Novo Cliente</h3>
-          <p className="text-xs text-[var(--gray)] mt-0.5">Busque por CNPJ para autopreenchimento rápido ou insira manualmente.</p>
+          <p className="text-xs text-[var(--gray)] mt-0.5">Insira o CNPJ da empresa para realizar o preenchimento automático das fichas fiscais.</p>
         </div>
 
-        {/* CNPJ Query field */}
+        {/* CNPJ Input Header */}
         <div className="flex flex-col gap-1.5">
           <label className="label">Buscar CNPJ</label>
           <div className="flex gap-2">
@@ -520,122 +698,228 @@ function NewContactModal({
           {cnpjError && <span className="text-[10px] text-[var(--red)] font-semibold">{cnpjError}</span>}
         </div>
 
-        <hr className="border-[var(--line)]" />
+        {/* Scrollable Form Body */}
+        <div className="max-h-[60vh] overflow-y-auto pr-1 flex flex-col gap-5 border-t border-[var(--line)] pt-3">
+          
+          {/* SEC 1: IDENTIFICAÇÃO */}
+          <div>
+            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3">Dados Cadastrais</h4>
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="label">Razão Social / Empresa *</label>
+                <input 
+                  type="text" 
+                  required
+                  className="input" 
+                  placeholder="Nome da Empresa"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                />
+              </div>
 
-        {/* Main Info */}
-        <div className="flex flex-col gap-1.5">
-          <label className="label">Razão Social / Empresa *</label>
-          <input 
-            type="text" 
-            required
-            className="input" 
-            placeholder="Nome da Empresa"
-            value={company}
-            onChange={(e) => setCompany(e.target.value)}
-          />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">Nome Fantasia</label>
+                  <input 
+                    type="text" 
+                    className="input" 
+                    placeholder="Nome Fantasia"
+                    value={tradeName}
+                    onChange={(e) => setTradeName(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">Responsável (Pessoa Física) *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input font-bold border-dashed border-[var(--lime)]" 
+                    placeholder="Nome do Contato Principal"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">CNPJ (Formatado)</label>
+                  <input 
+                    type="text" 
+                    className="input font-mono" 
+                    placeholder="00.000.000/0001-00"
+                    value={cnpj}
+                    onChange={(e) => setCnpj(formatCnpj(e.target.value))}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">Curva ABC</label>
+                  <select 
+                    className="input" 
+                    value={curve} 
+                    onChange={(e) => setCurve(e.target.value as any)}
+                  >
+                    <option value="A">Curva A</option>
+                    <option value="B">Curva B</option>
+                    <option value="C">Curva C</option>
+                    <option value="D">Curva D</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SEC 2: FISCAL */}
+          <div>
+            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3">Informações Fiscais e Tributárias</h4>
+            <div className="flex flex-col gap-3">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">Situação Cadastral</label>
+                  <input 
+                    type="text" 
+                    className="input" 
+                    placeholder="Ex: ATIVA"
+                    style={{ color: registrationStatus === 'ATIVA' ? 'var(--green)' : 'var(--white)' }}
+                    value={registrationStatus}
+                    onChange={(e) => setRegistrationStatus(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">Regime Tributário</label>
+                  <select 
+                    className="input" 
+                    value={taxRegime} 
+                    onChange={(e) => setTaxRegime(e.target.value as any)}
+                  >
+                    <option value="MEI">MEI</option>
+                    <option value="Simples Nacional">Simples Nacional</option>
+                    <option value="Lucro Presumido">Lucro Presumido</option>
+                    <option value="Lucro Real">Lucro Real</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="label">CNAE Principal</label>
+                <input 
+                  type="text" 
+                  className="input" 
+                  placeholder="CNAE e Descrição da Atividade"
+                  value={mainCnae}
+                  onChange={(e) => setMainCnae(e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">Situação Especial</label>
+                  <input 
+                    type="text" 
+                    className="input" 
+                    placeholder="Nenhuma"
+                    value={specialSituation}
+                    onChange={(e) => setSpecialSituation(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">Data da Situação Especial</label>
+                  <input 
+                    type="text" 
+                    className="input" 
+                    placeholder="-"
+                    value={specialSituationDate}
+                    onChange={(e) => setSpecialSituationDate(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SEC 3: ENDEREÇO & CONTATO */}
+          <div>
+            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3">Endereço e Contato</h4>
+            <div className="flex flex-col gap-3">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">Telefone</label>
+                  <input 
+                    type="text" 
+                    className="input" 
+                    placeholder="(00) 00000-0000"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">E-mail</label>
+                  <input 
+                    type="email" 
+                    className="input" 
+                    placeholder="contato@empresa.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="label">Endereço de Correspondência</label>
+                <input 
+                  type="text" 
+                  className="input text-xs" 
+                  placeholder="Rua, Número, Bairro - CEP"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-2 flex flex-col gap-1.5">
+                  <label className="label">Cidade</label>
+                  <input 
+                    type="text" 
+                    className="input" 
+                    placeholder="Sapiranga"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">UF</label>
+                  <input 
+                    type="text" 
+                    maxLength={2}
+                    className="input uppercase text-center font-bold font-mono" 
+                    placeholder="RS"
+                    value={state}
+                    onChange={(e) => setState(e.target.value.toUpperCase())}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="label">Representante Associado</label>
+                <input 
+                  type="text" 
+                  className="input" 
+                  value={representative}
+                  onChange={(e) => setRepresentative(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="label">Responsável (Pessoa Física) *</label>
-            <input 
-              type="text" 
-              required
-              className="input" 
-              placeholder="Nome do Contato"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="label">CNPJ (Formatado)</label>
-            <input 
-              type="text" 
-              className="input font-mono" 
-              placeholder="00.000.000/0001-00"
-              value={cnpj}
-              onChange={(e) => setCnpj(formatCnpj(e.target.value))}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="label">Curva ABC</label>
-            <select 
-              className="input" 
-              value={curve} 
-              onChange={(e) => setCurve(e.target.value as any)}
-            >
-              <option value="A">Curva A</option>
-              <option value="B">Curva B</option>
-              <option value="C">Curva C</option>
-              <option value="D">Curva D</option>
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="label">Representante</label>
-            <input 
-              type="text" 
-              className="input" 
-              value={representative}
-              onChange={(e) => setRepresentative(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="label">Telefone</label>
-            <input 
-              type="text" 
-              className="input" 
-              placeholder="(00) 00000-0000"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="label">E-mail</label>
-            <input 
-              type="email" 
-              className="input" 
-              placeholder="exemplo@empresa.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-2 flex flex-col gap-1.5">
-            <label className="label">Cidade</label>
-            <input 
-              type="text" 
-              className="input" 
-              placeholder="Sapiranga"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="label">UF</label>
-            <input 
-              type="text" 
-              maxLength={2}
-              className="input uppercase text-center" 
-              placeholder="RS"
-              value={state}
-              onChange={(e) => setState(e.target.value.toUpperCase())}
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end gap-3 mt-2">
+        {/* Footer Actions */}
+        <div className="flex justify-end gap-3 mt-2 border-t border-[var(--line)] pt-3">
           <button 
             type="button" 
             onClick={onCancel}
@@ -711,7 +995,16 @@ export default function ContactsPage() {
       city: data.city || '',
       state: data.state || '',
       status: 'ativo',
-      lastPurchaseDays: 0 // New client starts active
+      lastPurchaseDays: 0,
+      
+      // New fields mapping
+      tradeName: data.tradeName || '',
+      registrationStatus: data.registrationStatus || 'ATIVA',
+      mainCnae: data.mainCnae || '',
+      address: data.address || '',
+      taxRegime: data.taxRegime || 'Simples Nacional',
+      specialSituation: data.specialSituation || 'Nenhuma',
+      specialSituationDate: data.specialSituationDate || '-'
     }
 
     setContacts(prev => [newContact, ...prev])
