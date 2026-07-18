@@ -857,41 +857,45 @@ function NewContactModal({
           <div className="flex flex-col gap-4">
             <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1">Informações Fiscais</h4>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
-                <label className="label">Situação Cadastral</label>
-                <input 
-                  type="text" 
-                  className="input font-bold" 
-                  placeholder="Ex: ATIVA"
-                  style={{ color: registrationStatus.includes('ATIVA') ? 'var(--green)' : 'var(--white)' }}
-                  value={registrationStatus}
-                  onChange={(e) => setRegistrationStatus(e.target.value)}
-                />
-              </div>
+              
+              {/* Row 1: Situação Cadastral, Regime Tributário, Inscrição Estadual side-by-side */}
+              <div className="col-span-1 md:col-span-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">Situação Cadastral</label>
+                  <input 
+                    type="text" 
+                    className="input font-bold" 
+                    placeholder="Ex: ATIVA"
+                    style={{ color: registrationStatus.includes('ATIVA') ? 'var(--green)' : 'var(--white)' }}
+                    value={registrationStatus}
+                    onChange={(e) => setRegistrationStatus(e.target.value)}
+                  />
+                </div>
 
-              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
-                <label className="label">Regime Tributário</label>
-                <select 
-                  className="input" 
-                  value={taxRegime} 
-                  onChange={(e) => setTaxRegime(e.target.value as any)}
-                >
-                  <option value="MEI">MEI</option>
-                  <option value="Simples Nacional">Simples Nacional</option>
-                  <option value="Lucro Presumido">Lucro Presumido</option>
-                  <option value="Lucro Real">Lucro Real</option>
-                </select>
-              </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">Regime Tributário</label>
+                  <select 
+                    className="input" 
+                    value={taxRegime} 
+                    onChange={(e) => setTaxRegime(e.target.value as any)}
+                  >
+                    <option value="MEI">MEI</option>
+                    <option value="Simples Nacional">Simples Nacional</option>
+                    <option value="Lucro Presumido">Lucro Presumido</option>
+                    <option value="Lucro Real">Lucro Real</option>
+                  </select>
+                </div>
 
-              <div className="col-span-1 md:col-span-4 flex flex-col gap-1.5">
-                <label className="label">Inscrição Estadual</label>
-                <input 
-                  type="text" 
-                  className="input font-mono" 
-                  placeholder="Preencher manualmente se houver"
-                  value={stateRegistration}
-                  onChange={(e) => setStateRegistration(e.target.value)}
-                />
+                <div className="flex flex-col gap-1.5">
+                  <label className="label">Inscrição Estadual</label>
+                  <input 
+                    type="text" 
+                    className="input font-mono" 
+                    placeholder="Preencher manualmente se houver"
+                    value={stateRegistration}
+                    onChange={(e) => setStateRegistration(e.target.value)}
+                  />
+                </div>
               </div>
 
               <div className="col-span-1 md:col-span-4 flex flex-col gap-1.5">
