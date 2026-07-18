@@ -727,8 +727,8 @@ function NewContactModal({
         setTaxRegime('Lucro Presumido')
       }
 
-      setSpecialSituation(data.specialSituation || 'Nenhuma')
-      setSpecialSituationDate(data.specialSituationDate ? formatDateBr(data.specialSituationDate) : '-')
+      setSpecialSituation(data.special?.text || 'Nenhuma')
+      setSpecialSituationDate(data.specialDate ? formatDateBr(data.specialDate) : '-')
       
       // Retrieve state registration (IE) from registrations array matching address state or first active
       let ieVal = ''
