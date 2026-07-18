@@ -657,6 +657,8 @@ function NewContactModal({
   // Expanded properties states
   const [registrationStatus, setRegistrationStatus] = useState('ATIVA')
   const [mainCnae, setMainCnae] = useState('')
+  const [sideActivities, setSideActivities] = useState<{id: string; text: string}[]>([])
+  const [showSideActivities, setShowSideActivities] = useState(false)
   const [address, setAddress] = useState('')
   const [bairro, setBairro] = useState('')
   const [cep, setCep] = useState('')
@@ -702,6 +704,14 @@ function NewContactModal({
       const mainCnaeId = data.mainActivity?.id
       const mainCnaeDesc = data.mainActivity?.text
       setMainCnae(mainCnaeId ? `${mainCnaeId} - ${mainCnaeDesc || ''}` : '')
+
+      // Populate secondary activities
+      const sides = (data.sideActivities || []).map((a: any) => ({
+        id: String(a.id || ''),
+        text: a.text || ''
+      }))
+      setSideActivities(sides)
+      setShowSideActivities(false)
       
       // Populate address fields separately from CNPJá structure
       const addr = data.address
@@ -911,9 +921,9 @@ function NewContactModal({
                 </div>
               </div>
 
-              {/* Linha 1: Rua + Número | Bairro */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1">
+              {/* Linha 1: Rua + Número (2/3) | Bairro (1/3) */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="col-span-2 flex flex-col gap-1">
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Rua / Número</label>
                   <input 
                     type="text" 
@@ -935,9 +945,9 @@ function NewContactModal({
                 </div>
               </div>
 
-              {/* Linha 2: CEP | Cidade | UF (pequeno) | ícone mapa */}
+              {/* Linha 2: CEP | Cidade | UF | ícone mapa */}
               <div className="flex gap-3 items-end">
-                <div className="flex flex-col gap-1" style={{ width: '120px', flexShrink: 0 }}>
+                <div className="flex flex-col gap-1" style={{ width: '110px', flexShrink: 0 }}>
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CEP</label>
                   <input 
                     type="text" 
@@ -949,7 +959,7 @@ function NewContactModal({
                   />
                 </div>
 
-                <div className="flex flex-col gap-1 flex-1">
+                <div className="flex flex-col gap-1" style={{ width: '160px', flexShrink: 0 }}>
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Cidade</label>
                   <input 
                     type="text" 
@@ -960,7 +970,7 @@ function NewContactModal({
                   />
                 </div>
 
-                <div className="flex flex-col gap-1" style={{ width: '56px', flexShrink: 0 }}>
+                <div className="flex flex-col gap-1 flex-1">
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">UF</label>
                   <input 
                     type="text" 
@@ -972,14 +982,14 @@ function NewContactModal({
                   />
                 </div>
 
-                {/* Map icon — icon size only */}
+                {/* Map icon — same height as inputs, self-end aligned */}
                 <a
                   href={(address || city) ? `https://www.openstreetmap.org/search?query=${encodeURIComponent([address, bairro, city, state, cep].filter(Boolean).join(', '))}` : '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   title="Ver endereço no mapa"
-                  style={{ marginBottom: '1px' }}
-                  className={`flex items-center justify-center rounded-lg border p-2 transition-colors ${(address || city) ? 'border-[var(--line)] text-[var(--gray)] hover:border-[var(--lime)] hover:text-[var(--lime)] cursor-pointer' : 'border-[var(--line)] text-[var(--gray2)] opacity-30 pointer-events-none'}`}
+                  className={`self-end flex items-center justify-center rounded-lg border transition-colors flex-shrink-0 ${(address || city) ? 'border-[var(--line)] text-[var(--gray)] hover:border-[var(--lime)] hover:text-[var(--lime)] cursor-pointer' : 'border-[var(--line)] text-[var(--gray2)] opacity-30 pointer-events-none'}`}
+                  style={{ width: '32px', height: '32px' }}
                 >
                   <MapPin size={14} />
                 </a>
@@ -999,6 +1009,39 @@ function NewContactModal({
                   onChange={(e) => setMainCnae(e.target.value)}
                 />
               </div>
+
+              {/* Botão e lista de atividades secundárias */}
+              {sideActivities.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowSideActivities(v => !v)}
+                    className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider font-mono transition-colors w-fit"
+                    style={{ color: showSideActivities ? 'var(--lime)' : 'var(--gray)' }}
+                  >
+                    <span
+                      className="inline-block transition-transform duration-200"
+                      style={{ transform: showSideActivities ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                    >▶</span>
+                    {showSideActivities ? 'Ocultar' : `Ver`} atividades secundárias ({sideActivities.length})
+                  </button>
+
+                  {showSideActivities && (
+                    <div className="flex flex-col gap-1 border border-[var(--line)] rounded-lg overflow-hidden">
+                      {sideActivities.map((act, i) => (
+                        <div
+                          key={act.id}
+                          className="flex gap-2 px-3 py-1.5 text-xs font-mono"
+                          style={{ background: i % 2 === 0 ? 'var(--card2)' : 'transparent' }}
+                        >
+                          <span className="text-[var(--lime)] font-bold shrink-0">{act.id}</span>
+                          <span className="text-[var(--gray)]">{act.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
           </div>
