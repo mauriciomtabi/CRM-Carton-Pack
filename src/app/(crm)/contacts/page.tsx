@@ -1192,9 +1192,11 @@ export default function ContactsPage() {
   const representatives = Array.from(new Set(contacts.map(c => c.representative)))
 
   function openMap(e: React.MouseEvent, contact: MockContact) {
-    e.stopPropagation() // Don't trigger row click drawer
-    setModalContact(contact)
-    setShowMapModal(true)
+    e.stopPropagation()
+    const query = [contact.address, contact.bairro, contact.city, contact.state, contact.cep].filter(Boolean).join(', ')
+    if (query) {
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank')
+    }
   }
 
   const handleUpdateContact = (updatedContact: MockContact) => {
@@ -1310,6 +1312,8 @@ export default function ContactsPage() {
               <tr className="border-b border-[var(--line)] bg-[var(--charcoal)] font-mono text-[10px] text-[var(--gray)] uppercase tracking-wider">
                 <th className="p-4 pl-6">Cliente / CNPJ</th>
                 <th className="p-4">Curva</th>
+                <th className="p-4">Cidade</th>
+                <th className="p-4">UF</th>
                 <th className="p-4">Representante</th>
                 <th className="p-4">Última Compra</th>
                 <th className="p-4 pr-6 text-right">Localização</th>
@@ -1358,6 +1362,16 @@ export default function ContactsPage() {
                       </span>
                     </td>
 
+                    {/* Cidade */}
+                    <td className="p-4">
+                      <span className="text-xs text-[var(--white)] font-mono">{contact.city || <span className="text-[var(--gray2)]">-</span>}</span>
+                    </td>
+
+                    {/* UF */}
+                    <td className="p-4">
+                      <span className="text-xs font-bold text-[var(--gray)] font-mono uppercase">{contact.state || '-'}</span>
+                    </td>
+
                     {/* Representante */}
                     <td className="p-4 text-xs font-semibold text-[var(--white)]">
                       <div className="flex items-center gap-2">
@@ -1374,14 +1388,18 @@ export default function ContactsPage() {
                       </div>
                     </td>
 
-                    {/* Localizacao / Fachada */}
+                    {/* Localizacao — Google Maps icon */}
                     <td className="p-4 pr-6 text-right">
                       <button 
                         onClick={(e) => openMap(e, contact)}
-                        className="btn btn-ghost btn-sm text-[var(--gray)] hover:text-white inline-flex items-center gap-1.5"
+                        title="Ver no Google Maps"
+                        className={`inline-flex items-center justify-center transition-colors ${
+                          (contact.address || contact.city)
+                            ? 'text-[var(--lime)] hover:opacity-70 cursor-pointer'
+                            : 'text-[var(--gray2)] opacity-30 pointer-events-none'
+                        }`}
                       >
-                        <MapPin size={12} />
-                        <span>Ver Fachada</span>
+                        <MapPin size={18} />
                       </button>
                     </td>
                   </tr>
@@ -1390,7 +1408,7 @@ export default function ContactsPage() {
 
               {filteredContacts.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-12 text-center text-sm text-[var(--gray2)] font-mono">
+                  <td colSpan={7} className="p-12 text-center text-sm text-[var(--gray2)] font-mono">
                     Nenhum cliente encontrado com os filtros selecionados.
                   </td>
                 </tr>
