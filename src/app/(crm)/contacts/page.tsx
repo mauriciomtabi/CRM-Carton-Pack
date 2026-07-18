@@ -988,7 +988,7 @@ function NewContactModal({
                   target="_blank"
                   rel="noopener noreferrer"
                   title="Ver endereço no mapa"
-                  className={`self-center flex-shrink-0 transition-colors ${(address || city) ? 'text-[var(--lime)] hover:opacity-70 cursor-pointer' : 'text-[var(--gray2)] opacity-30 pointer-events-none'}`}
+                  className={`self-end mb-[7px] flex-shrink-0 transition-colors ${(address || city) ? 'text-[var(--lime)] hover:opacity-70 cursor-pointer' : 'text-[var(--gray2)] opacity-30 pointer-events-none'}`}
                 >
                   <MapPin size={18} />
                 </a>
