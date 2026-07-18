@@ -24,14 +24,19 @@ interface TeamUser {
   status: 'ativo' | 'inativo'
   phone: string
   createdAt: string
+  username?: string
+  tempPassword?: string
+  password?: string
+  isFirstAccess?: boolean
+  isEmailConfirmed?: boolean
 }
 
 const DEFAULT_USERS: TeamUser[] = [
-  { id: '1', name: 'Ana Lima', email: 'ana.lima@cartonpack.com', role: 'representante', status: 'ativo', phone: '(11) 98888-8888', createdAt: '10/05/2026' },
-  { id: '2', name: 'Ermínio Sales', email: 'erminio@cartonpack.com', role: 'representante', status: 'ativo', phone: '(51) 99999-9999', createdAt: '12/05/2026' },
-  { id: '3', name: 'Carlos Mendes', email: 'carlos.mendes@cartonpack.com', role: 'representante', status: 'ativo', phone: '(21) 97777-7777', createdAt: '15/05/2026' },
-  { id: '4', name: 'Julio Cesar', email: 'julio.admin@cartonpack.com', role: 'admin', status: 'ativo', phone: '(51) 98888-7777', createdAt: '01/05/2026' },
-  { id: '5', name: 'Mariana Costa', email: 'mariana.fin@cartonpack.com', role: 'financeiro', status: 'ativo', phone: '(51) 96666-5555', createdAt: '20/05/2026' },
+  { id: '1', name: 'Ana Lima', email: 'ana.lima@cartonpack.com', role: 'representante', status: 'ativo', phone: '(11) 98888-8888', createdAt: '10/05/2026', isFirstAccess: false, isEmailConfirmed: true, password: '123' },
+  { id: '2', name: 'Ermínio Sales', email: 'erminio@cartonpack.com', role: 'representante', status: 'ativo', phone: '(51) 99999-9999', createdAt: '12/05/2026', isFirstAccess: false, isEmailConfirmed: true, password: '123' },
+  { id: '3', name: 'Carlos Mendes', email: 'carlos.mendes@cartonpack.com', role: 'representante', status: 'ativo', phone: '(21) 97777-7777', createdAt: '15/05/2026', isFirstAccess: false, isEmailConfirmed: true, password: '123' },
+  { id: '4', name: 'Julio Cesar', email: 'julio.admin@cartonpack.com', role: 'admin', status: 'ativo', phone: '(51) 98888-7777', createdAt: '01/05/2026', isFirstAccess: false, isEmailConfirmed: true, password: '123' },
+  { id: '5', name: 'Mariana Costa', email: 'mariana.fin@cartonpack.com', role: 'financeiro', status: 'ativo', phone: '(51) 96666-5555', createdAt: '20/05/2026', isFirstAccess: false, isEmailConfirmed: true, password: '123' },
 ]
 
 function formatPhoneBr(v: string) {
@@ -58,6 +63,17 @@ export default function UsersPage() {
   const [role, setRole] = useState<TeamUser['role']>('vendedor')
   const [status, setStatus] = useState<TeamUser['status']>('ativo')
   const [phone, setPhone] = useState('')
+  const [tempPassword, setTempPassword] = useState('')
+  const [username, setUsername] = useState('')
+
+  // Success screen after creation
+  const [showCopyModal, setShowCopyModal] = useState(false)
+  const [createdUserCredentials, setCreatedUserCredentials] = useState<{
+    name: string
+    usernameOrEmail: string
+    tempPassword: string
+    type: 'cartonpack' | 'externo'
+  } | null>(null)
 
   // Load from localStorage
   useEffect(() => {
@@ -81,6 +97,20 @@ export default function UsersPage() {
     }
   }
 
+  const deriveUsername = (n: string) => {
+    const parts = n.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(/\s+/).filter(Boolean)
+    if (parts.length >= 2) {
+      return `${parts[0]}.${parts[1]}`
+    } else if (parts.length === 1) {
+      return parts[0]
+    }
+    return ''
+  }
+
+  const generateTempPassword = () => {
+    return 'CP-' + Math.floor(1000 + Math.random() * 9000)
+  }
+
   // Open modal for Create
   const handleOpenCreate = () => {
     setEditingUser(null)
@@ -89,6 +119,8 @@ export default function UsersPage() {
     setRole('vendedor')
     setStatus('ativo')
     setPhone('')
+    setTempPassword(generateTempPassword())
+    setUsername('')
     setShowModal(true)
   }
 
@@ -100,6 +132,8 @@ export default function UsersPage() {
     setRole(user.role)
     setStatus(user.status)
     setPhone(user.phone)
+    setTempPassword(user.tempPassword || '')
+    setUsername(user.username || '')
     setShowModal(true)
   }
 
@@ -108,16 +142,31 @@ export default function UsersPage() {
     e.preventDefault()
     if (!name.trim() || !email.trim()) return
 
+    const isCarton = email.toLowerCase().endsWith('@cartonpack.com')
+
     if (editingUser) {
       // Edit mode
       const updated = users.map(u => 
         u.id === editingUser.id 
-          ? { ...u, name, email, role, status, phone }
+          ? { 
+              ...u, 
+              name, 
+              email, 
+              role, 
+              status, 
+              phone, 
+              username: isCarton ? undefined : (username || deriveUsername(name)),
+              tempPassword: tempPassword || u.tempPassword
+            }
           : u
       )
       saveUsers(updated)
+      setShowModal(false)
     } else {
       // Create mode
+      const finalUsername = isCarton ? undefined : (username || deriveUsername(name))
+      const finalTempPassword = tempPassword || generateTempPassword()
+
       const newUser: TeamUser = {
         id: `u-${Date.now()}`,
         name,
@@ -125,12 +174,26 @@ export default function UsersPage() {
         role,
         status,
         phone: formatPhoneBr(phone),
-        createdAt: new Date().toLocaleDateString('pt-BR')
+        createdAt: new Date().toLocaleDateString('pt-BR'),
+        isFirstAccess: true,
+        isEmailConfirmed: isCarton ? false : true,
+        tempPassword: finalTempPassword,
+        username: finalUsername
       }
+      
       saveUsers([newUser, ...users])
+      
+      // Save credentials for the Copy Screen
+      setCreatedUserCredentials({
+        name,
+        usernameOrEmail: isCarton ? email : (finalUsername || email),
+        tempPassword: finalTempPassword,
+        type: isCarton ? 'cartonpack' : 'externo'
+      })
+      
+      setShowModal(false)
+      setShowCopyModal(true)
     }
-    
-    setShowModal(false)
   }
 
   // Delete user
@@ -405,7 +468,12 @@ export default function UsersPage() {
                     className="input w-full pl-9"
                     placeholder="Ex: Roberto Carlos"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(e.target.value)
+                      if (!editingUser) {
+                        setUsername(deriveUsername(e.target.value))
+                      }
+                    }}
                   />
                 </div>
               </div>
@@ -422,6 +490,42 @@ export default function UsersPage() {
                     placeholder="Ex: roberto.carlos@cartonpack.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Conditional Username & Password Fields */}
+              <div className="grid grid-cols-2 gap-4">
+                {!email.toLowerCase().endsWith('@cartonpack.com') ? (
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[9px] font-bold text-[var(--lime)] uppercase font-mono tracking-wider">Nome de Usuário *</label>
+                    <input
+                      type="text"
+                      required
+                      className="input w-full font-mono text-xs font-bold"
+                      placeholder="usuario.sobrenome"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Nome de Usuário</label>
+                    <div className="input w-full text-xs text-[var(--gray2)] font-mono flex items-center bg-[var(--charcoal)] opacity-50 select-none cursor-not-allowed">
+                      (Usará o E-mail)
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[9px] font-bold text-[var(--lime)] uppercase font-mono tracking-wider">Senha Temporária *</label>
+                  <input
+                    type="text"
+                    required
+                    className="input w-full font-mono text-xs font-bold text-[var(--lime)] bg-[var(--card)]"
+                    placeholder="CP-1234"
+                    value={tempPassword}
+                    onChange={(e) => setTempPassword(e.target.value)}
                   />
                 </div>
               </div>
@@ -512,6 +616,47 @@ export default function UsersPage() {
             </div>
 
           </form>
+        </div>
+      )}
+
+      {/* Copy Credentials Success Modal */}
+      {showCopyModal && createdUserCredentials && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[99999] flex items-center justify-center p-4">
+          <div className="bg-[var(--charcoal)] border border-[var(--lime)] rounded-2xl p-6 w-full max-w-md shadow-2xl flex flex-col gap-4 animate-fade-up">
+            <div className="flex justify-between items-start border-b border-[var(--line)] pb-3">
+              <div>
+                <h3 className="font-display text-base text-[var(--lime)] font-bold">Usuário Cadastrado!</h3>
+                <p className="text-xs text-[var(--gray)] mt-0.5 font-mono">Copie a mensagem para compartilhar com o membro da equipe.</p>
+              </div>
+              <button type="button" onClick={() => setShowCopyModal(false)} className="text-gray-400 hover:text-[var(--white)] p-1">
+                <X size={18} />
+              </button>
+            </div>
+            
+            <div className="bg-black/40 border border-[var(--line)] rounded-xl p-4 font-mono text-[11px] text-[var(--white)] whitespace-pre-wrap leading-relaxed select-all">
+{`Olá, ${createdUserCredentials.name}! Seu acesso ao CRM Carton Pack está liberado.
+
+Link de Acesso: https://crm.cartonpack.com
+${createdUserCredentials.type === 'cartonpack' ? `Login (E-mail): ${createdUserCredentials.usernameOrEmail}` : `Usuário: ${createdUserCredentials.usernameOrEmail}`}
+Senha Temporária: ${createdUserCredentials.tempPassword}
+
+${createdUserCredentials.type === 'cartonpack' 
+  ? 'Obs: No primeiro acesso você deverá alterar a senha temporária e confirmar o link de ativação enviado para o seu e-mail.' 
+  : 'Obs: No primeiro acesso você deverá alterar a senha temporária para ativar sua conta.'}`}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                const text = `Olá, ${createdUserCredentials.name}! Seu acesso ao CRM Carton Pack está liberado.\n\nLink de Acesso: https://crm.cartonpack.com\n${createdUserCredentials.type === 'cartonpack' ? `Login (E-mail): ${createdUserCredentials.usernameOrEmail}` : `Usuário: ${createdUserCredentials.usernameOrEmail}`}\nSenha Temporária: ${createdUserCredentials.tempPassword}\n\n${createdUserCredentials.type === 'cartonpack' ? 'Obs: No primeiro acesso você deverá alterar a senha temporária e confirmar o link de ativação enviado para o seu e-mail.' : 'Obs: No primeiro acesso você deverá alterar a senha temporária para ativar sua conta.'}`
+                navigator.clipboard.writeText(text)
+                alert('Mensagem de acesso copiada com sucesso!')
+              }}
+              className="btn btn-primary py-2.5 text-xs font-bold uppercase tracking-wider text-black w-full"
+            >
+              Copiar Mensagem de Acesso
+            </button>
+          </div>
         </div>
       )}
 

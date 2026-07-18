@@ -1,7 +1,29 @@
 'use client'
 
-import { useState } from 'react'
-import { TrendingUp, Package, CheckCircle, XCircle, AlertTriangle, ArrowRight, User, Filter, Calendar, Phone } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import {
+  TrendingUp,
+  Package,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  ArrowRight,
+  User,
+  Filter,
+  Calendar,
+  Phone,
+  Mic,
+  MicOff,
+  Camera,
+  MapPin,
+  Sparkles,
+  Clock,
+  ArrowUpRight,
+  Navigation,
+  LogOut,
+  Upload,
+  Check
+} from 'lucide-react'
 import { formatCurrency, whatsappLink } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -18,24 +40,83 @@ interface DealMock {
 }
 
 const MOCK_DEALS: DealMock[] = [
-  // Leads
   { id: '1', title: 'Caixa Premium Natura', representative: 'Ana Lima', stage: 'leads', value: 15000, curve: 'A', daysInactive: 15, contactName: 'Ana Lima', phone: '11988888888' },
-  { id: '2', title: 'Display Gota Limpa', representative: 'Ermínio', stage: 'leads', value: 25000, curve: 'A', daysInactive: 95, contactName: 'Alvaro Ferreira', phone: '51999999999' },
+  { id: '2', title: 'Display Gota Limpa', representative: 'Ermínio Sales', stage: 'leads', value: 25000, curve: 'A', daysInactive: 95, contactName: 'Alvaro Ferreira', phone: '51999999999' },
   { id: '3', title: 'Embalagem XP Presentes', representative: 'Carlos Mendes', stage: 'prospect', value: 12000, curve: 'B', daysInactive: 30, contactName: 'Carlos Mendes', phone: '21977777777' },
-  // Briefings / Orçamentos
   { id: '4', title: 'Caixa Vinho Gourmet', representative: 'Marina Costa', stage: 'briefing', value: 32000, curve: 'C', daysInactive: 10, contactName: 'Marina Costa', phone: '54922222222' },
   { id: '5', title: 'Embalagem Cosméticos M.', representative: 'Fernanda R.', stage: 'briefing', value: 18000, curve: 'C', daysInactive: 120, contactName: 'Fernanda Ramos', phone: '31966666666' },
-  // Fechamentos
   { id: '6', title: 'Kit Natal Lojas Renner', representative: 'Renner Compras', stage: 'fechamento', value: 87500, curve: 'A', daysInactive: 5, contactName: 'Renner Compras', phone: '51944444444' },
   { id: '7', title: 'Caixa Presente Boticário', representative: 'Gustavo N.', stage: 'aprovacao', value: 48000, curve: 'A', daysInactive: 45, contactName: 'Gustavo Nogueira', phone: '41955555555' },
-  // Perdidos
-  { id: '8', title: 'Bandeja Padaria Central', representative: 'Ermínio', stage: 'perdido', value: 23000, curve: 'D', daysInactive: 110, contactName: 'Paulo Lima', phone: '51933333333' },
+  { id: '8', title: 'Bandeja Padaria Central', representative: 'Ermínio Sales', stage: 'perdido', value: 23000, curve: 'D', daysInactive: 110, contactName: 'Paulo Lima', phone: '51933333333' },
 ]
 
 export default function DashboardPage() {
+  // Roles and Current User Session
+  const [currentUser, setCurrentUser] = useState<{ id: string; name: string; email: string; role: string } | null>(null)
+  const [contacts, setContacts] = useState<any[]>([])
+
+  // Dashboard Filters
   const [selectedRep, setSelectedRep] = useState<string>('all')
   const [selectedCurve, setSelectedCurve] = useState<string>('all')
   const [selectedPeriod, setSelectedPeriod] = useState<string>('30')
+
+  // Representative Portal States
+  const [visitsGoal, setVisitsGoal] = useState(15)
+  const [completedVisits, setCompletedVisits] = useState(8)
+  const [showCheckinModal, setShowCheckinModal] = useState(false)
+  const [selectedContactId, setSelectedContactId] = useState('')
+  const [isRecording, setIsRecording] = useState(false)
+  const [isTranscribing, setIsTranscribing] = useState(false)
+  const [recordingTime, setRecordingTime] = useState(0)
+  const [audioTranscription, setAudioTranscription] = useState('')
+  const [photoUrl, setPhotoUrl] = useState('')
+  const [checkinSuccessToast, setCheckinSuccessToast] = useState(false)
+
+  // Load Session and Database
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const session = localStorage.getItem('crm_current_user')
+      if (session) {
+        try {
+          setCurrentUser(JSON.parse(session))
+        } catch (e) {
+          console.error(e)
+        }
+      } else {
+        // Fallback default admin for test
+        setCurrentUser({ id: '4', name: 'Julio Cesar', email: 'julio.admin@cartonpack.com', role: 'admin' })
+      }
+
+      const savedContacts = localStorage.getItem('crm_contacts')
+      if (savedContacts) {
+        try {
+          setContacts(JSON.parse(savedContacts))
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    }
+  }, [])
+
+  // Timer for Audio Record simulation
+  useEffect(() => {
+    let interval: any
+    if (isRecording) {
+      interval = setInterval(() => {
+        setRecordingTime(t => t + 1)
+      }, 1000)
+    } else {
+      setRecordingTime(0)
+    }
+    return () => clearInterval(interval)
+  }, [isRecording])
+
+  const saveContacts = (updated: any[]) => {
+    setContacts(updated)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('crm_contacts', JSON.stringify(updated))
+    }
+  }
 
   // Filter deals based on state
   const filteredDeals = MOCK_DEALS.filter(deal => {
@@ -82,7 +163,7 @@ export default function DashboardPage() {
 
   const maxCount = Math.max(...funnelSummary.map(s => s.count), 1)
 
-  // Inactive / Stale deals alerts (stale if inactive > 30 days)
+  // Inactive / Stale deals alerts
   const staleDeals = filteredDeals
     .filter(d => d.daysInactive >= 30 && d.stage !== 'fechamento' && d.stage !== 'perdido')
     .sort((a, b) => b.daysInactive - a.daysInactive)
@@ -96,13 +177,393 @@ export default function DashboardPage() {
 
   const representatives = Array.from(new Set(MOCK_DEALS.map(d => d.representative)))
 
+  // Audio Recording handlers
+  const handleStartRecording = () => {
+    setIsRecording(true)
+    setAudioTranscription('')
+  }
+
+  const handleStopRecording = () => {
+    setIsRecording(false)
+    setIsTranscribing(true)
+    
+    // Simulate transcription wait
+    setTimeout(() => {
+      setIsTranscribing(false)
+      setAudioTranscription(
+        "Reunião presencial produtiva. O cliente analisou os novos mostruários de papel cartão triplex com verniz localizado. Gostou do acabamento Carton Pack e solicitou orçamento detalhado para lote inicial de 5.000 caixas personalizadas."
+      )
+    }, 2500)
+  }
+
+  // Handle Photo selection simulation
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      const url = URL.createObjectURL(file)
+      setPhotoUrl(url)
+    }
+  }
+
+  // Submit Visit Check-in
+  const handleCheckinSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedContactId) return
+
+    const selectedContact = contacts.find(c => c.id === selectedContactId)
+    if (!selectedContact) return
+
+    // Inject check-in note to timeline
+    const checkinActivity = {
+      date: new Date().toLocaleDateString('pt-BR'),
+      title: 'Check-in de Visita Comercial (Voz & Foto)',
+      description: audioTranscription || 'Visita presencial efetuada pelo representante.',
+      type: 'visita',
+      hasAudio: !!audioTranscription,
+      photoUrl: photoUrl || null,
+      gps: 'Sapucaia do Sul - RS (GPS Simulado: -29.834, -51.143)'
+    }
+
+    const updatedContacts = contacts.map(c => {
+      if (c.id === selectedContactId) {
+        // Reset inactivity, set status as active (ativo)
+        return {
+          ...c,
+          status: 'ativo',
+          lastPurchaseDays: 1, // Visited now
+          activities: [checkinActivity, ...(c.activities || [])]
+        }
+      }
+      return c
+    })
+
+    saveContacts(updatedContacts)
+    setCompletedVisits(v => v + 1)
+    
+    // Reset states
+    setShowCheckinModal(false)
+    setSelectedContactId('')
+    setAudioTranscription('')
+    setPhotoUrl('')
+    
+    // Show toast
+    setCheckinSuccessToast(true)
+    setTimeout(() => setCheckinSuccessToast(false), 4000)
+  }
+
+  // Mobile layout filter: representative contacts needing attention (visited >30 days or inactive)
+  const repContactsNeedingAttention = contacts.filter(c => {
+    // If current logged-in user is representative, only show their clients
+    const isOwner = !currentUser || c.representative === currentUser.name
+    const isInactive = c.status === 'inativo' || (c.lastPurchaseDays && c.lastPurchaseDays > 30)
+    return isOwner && isInactive
+  })
+
+  // Format recording timer helper
+  const formatTimer = (s: number) => {
+    const min = Math.floor(s / 60)
+    const sec = s % 60
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`
+  }
+
+  // LOGOUT simulation
+  const handleLogout = () => {
+    localStorage.removeItem('crm_current_user')
+    window.location.href = '/login'
+  }
+
+  // ==================== ROLE: REPRESENTANTE (MOBILE PORTAL) ====================
+  if (currentUser?.role === 'representante') {
+    return (
+      <div className="page-content animate-fade-in w-full h-full flex flex-col gap-5 max-w-md mx-auto px-1 py-3 pb-24">
+        
+        {/* Mobile Header */}
+        <div className="flex items-center justify-between border-b border-[var(--line)] pb-4 mt-2">
+          <div>
+            <span className="text-[10px] font-mono text-[var(--lime)] font-bold tracking-wider uppercase">Portal do Representante</span>
+            <h1 className="font-display text-xl text-[var(--white)] font-bold tracking-tight mt-0.5">
+              Olá, {currentUser.name}!
+            </h1>
+            <p className="text-[11px] text-[var(--gray)] font-mono">Pronto para visitar seus clientes hoje?</p>
+          </div>
+          <button 
+            onClick={handleLogout}
+            title="Sair do CRM"
+            className="p-2 border border-[var(--line)] rounded-xl text-[var(--gray2)] hover:text-red-400 hover:bg-[rgba(239,68,68,0.1)] transition-all bg-transparent"
+          >
+            <LogOut size={16} />
+          </button>
+        </div>
+
+        {/* Visit Meta Target Card */}
+        <div className="card p-5 relative overflow-hidden bg-gradient-to-br from-[var(--charcoal)] to-[#151617] border border-[rgba(180,217,50,0.15)] flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <div className="text-[10px] font-mono text-[var(--gray)] font-bold uppercase tracking-wide">Meta de Visitas Mensal</div>
+              <div className="text-2xl font-display font-black text-[var(--lime)] mt-1">{completedVisits} <span className="text-xs text-[var(--gray2)] font-mono font-medium">/ {visitsGoal} realizadas</span></div>
+            </div>
+            {/* Visual Circular Ring Progress simulated */}
+            <div className="w-14 h-14 rounded-full border-4 border-[rgba(180,217,50,0.1)] flex items-center justify-center relative" style={{ borderColor: 'rgba(180,217,50,0.1)' }}>
+              <div className="absolute inset-0 rounded-full border-4 border-[var(--lime)]" style={{ clipPath: `polygon(0 0, 100% 0, 100% ${Math.min(100, Math.floor((completedVisits/visitsGoal)*100))}%, 0 ${Math.min(100, Math.floor((completedVisits/visitsGoal)*100))}%)` }}></div>
+              <span className="text-xs font-mono font-black text-[var(--white)]">{Math.floor((completedVisits / visitsGoal) * 100)}%</span>
+            </div>
+          </div>
+
+          <div className="w-full bg-black/40 rounded-full h-2 overflow-hidden border border-[var(--line)]">
+            <div className="bg-[var(--lime)] h-full transition-all duration-500 ease-out" style={{ width: `${(completedVisits / visitsGoal) * 100}%` }}></div>
+          </div>
+          
+          <button 
+            onClick={() => {
+              setSelectedContactId('')
+              setAudioTranscription('')
+              setPhotoUrl('')
+              setShowCheckinModal(true)
+            }}
+            className="btn btn-primary py-3 text-xs font-black uppercase tracking-wider text-black flex items-center justify-center gap-2 rounded-xl shadow-lg shadow-[rgba(180,217,50,0.2)] mt-1"
+          >
+            <MapPin size={14} />
+            <span>Registrar Visita (Check-in)</span>
+          </button>
+        </div>
+
+        {/* Check-in Success Toast Notification */}
+        {checkinSuccessToast && (
+          <div className="bg-[rgba(34,197,94,0.95)] border border-[rgba(34,197,94,0.3)] rounded-xl p-3 text-black text-xs font-bold flex items-center gap-2 shadow-2xl animate-fade-in z-50">
+            <CheckCircle size={15} />
+            <span>Visita e relato por voz salvos no cliente com sucesso! Meta atualizada.</span>
+          </div>
+        )}
+
+        {/* Dynamic Route/Inactivity Alerts section */}
+        <div>
+          <h3 className="text-xs font-mono font-bold text-[var(--gray2)] uppercase tracking-wider mb-3 flex items-center justify-between">
+            <span>Clientes Pendentes ({repContactsNeedingAttention.length})</span>
+            <span className="text-[10px] text-[var(--yellow)]">Foco Inatividade</span>
+          </h3>
+
+          <div className="flex flex-col gap-3">
+            {repContactsNeedingAttention.map(contact => (
+              <div key={contact.id} className="card p-4 hover:border-[var(--lime)] transition-colors flex flex-col gap-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="text-sm font-bold text-[var(--white)]">{contact.name}</h4>
+                    <p className="text-[11px] text-[var(--gray)] font-mono mt-0.5">{contact.city} · {contact.uf}</p>
+                  </div>
+                  <span className={`font-mono text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                    contact.status === 'inativo' ? 'bg-[rgba(239,68,68,0.15)] text-[var(--red)] border border-[rgba(239,68,68,0.25)]' : 'bg-[rgba(240,196,25,0.15)] text-[var(--yellow)] border border-[rgba(240,196,25,0.25)]'
+                  }`}>
+                    {contact.lastPurchaseDays ? `${contact.lastPurchaseDays}d sem compra` : 'Inativo'}
+                  </span>
+                </div>
+
+                <div className="border-t border-[var(--line)] pt-3 flex gap-2">
+                  <a 
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${contact.name} ${contact.city} ${contact.uf}`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 btn btn-secondary text-[11px] py-2 flex items-center justify-center gap-1.5 rounded-lg border-[var(--line)]"
+                  >
+                    <Navigation size={12} className="text-[var(--lime)]" />
+                    <span>Traçar Rota</span>
+                  </a>
+                  
+                  <button 
+                    onClick={() => {
+                      setSelectedContactId(contact.id)
+                      setAudioTranscription('')
+                      setPhotoUrl('')
+                      setShowCheckinModal(true)
+                    }}
+                    className="flex-1 btn btn-secondary text-[11px] py-2 flex items-center justify-center gap-1.5 rounded-lg hover:border-[var(--lime)] hover:text-[var(--lime)]"
+                  >
+                    <MapPin size={12} />
+                    <span>Check-in</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {repContactsNeedingAttention.length === 0 && (
+              <div className="card p-8 text-center text-xs text-[var(--gray2)] font-mono border-dashed">
+                🎉 Parabéns! Todos os seus clientes estão visitados e ativos.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Check-in Modal Overlay */}
+        {showCheckinModal && (
+          <div className="fixed inset-0 bg-black/95 z-[99999] flex flex-col justify-end">
+            <div className="bg-[var(--charcoal)] border-t border-[var(--line)] rounded-t-3xl p-5 flex flex-col gap-4 animate-fade-up max-w-md mx-auto w-full h-[95vh] overflow-y-auto">
+              
+              {/* Header */}
+              <div className="flex justify-between items-center border-b border-[var(--line)] pb-3">
+                <div>
+                  <h3 className="font-display text-sm text-[var(--white)] font-bold">Registrar Visita Presencial</h3>
+                  <p className="text-[10px] text-[var(--gray)] font-mono mt-0.5">GPS: Sapucaia do Sul - RS (Simulado)</p>
+                </div>
+                <button 
+                  onClick={() => setShowCheckinModal(false)}
+                  className="p-1 rounded-lg bg-black/20 text-[var(--gray)] hover:text-white"
+                >
+                  Fechar
+                </button>
+              </div>
+
+              <form onSubmit={handleCheckinSubmit} className="flex flex-col gap-4 flex-1">
+                
+                {/* Select Contact */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Cliente Visitado *</label>
+                  <select
+                    className="input w-full"
+                    required
+                    value={selectedContactId}
+                    onChange={(e) => setSelectedContactId(e.target.value)}
+                  >
+                    <option value="">Selecione o Cliente...</option>
+                    {contacts.map(c => (
+                      <option key={c.id} value={c.id}>{c.name} ({c.city}-{c.uf})</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Simulated GPS Indicator */}
+                <div className="flex items-center gap-2 p-2.5 bg-black/40 border border-[var(--line)] rounded-xl text-[10px] font-mono text-[var(--gray)]">
+                  <MapPin size={12} className="text-[var(--lime)] shrink-0" />
+                  <span>Check-in GPS validado no local do cliente.</span>
+                </div>
+
+                {/* AUDIO RECORDING SECTION */}
+                <div className="flex flex-col gap-1.5 border border-[var(--line)] rounded-xl p-4 bg-black/20">
+                  <label className="text-[9px] font-bold text-[var(--lime)] uppercase font-mono tracking-wider flex items-center justify-between">
+                    <span>Relato Comercial por Voz</span>
+                    {isRecording && <span className="text-[var(--red)] animate-pulse">Gravando... {formatTimer(recordingTime)}</span>}
+                  </label>
+                  
+                  <div className="flex flex-col items-center justify-center py-4 gap-3">
+                    {/* Visualizer Waveform during recording */}
+                    {isRecording ? (
+                      <div className="flex items-center gap-1 justify-center h-10 w-full">
+                        {[...Array(9)].map((_, i) => (
+                          <div 
+                            key={i} 
+                            className="w-1.5 bg-[var(--lime)] rounded-full animate-pulse"
+                            style={{
+                              animationDelay: `${i * 0.1}s`,
+                              height: `${Math.floor(10 + Math.random() * 26)}px`
+                            }}
+                          />
+                        ))}
+                      </div>
+                    ) : isTranscribing ? (
+                      <div className="flex flex-col items-center gap-2 py-2">
+                        <div className="w-6 h-6 border-2 border-[var(--lime)] border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-[10px] text-[var(--gray)] font-mono animate-pulse">Gerando inteligência por áudio...</span>
+                      </div>
+                    ) : (
+                      <div className="text-[10px] text-[var(--gray2)] font-mono text-center max-w-[200px]">
+                        Toque no microfone abaixo e fale seu relato para transcrever.
+                      </div>
+                    )}
+
+                    {/* Microphone Toggle Button */}
+                    <button
+                      type="button"
+                      onClick={isRecording ? handleStopRecording : handleStartRecording}
+                      className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
+                        isRecording 
+                          ? 'bg-[var(--red)] text-white hover:bg-[#ef4444] animate-ping-slow' 
+                          : 'bg-[var(--lime)] text-black hover:scale-105'
+                      }`}
+                    >
+                      {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+                    </button>
+                  </div>
+
+                  {/* Audio Transcription text result editable */}
+                  <textarea
+                    className="input w-full min-h-[90px] text-xs font-mono"
+                    placeholder="Transcrição do áudio aparecerá aqui..."
+                    value={audioTranscription}
+                    onChange={(e) => setAudioTranscription(e.target.value)}
+                  />
+                </div>
+
+                {/* PHOTO UPLOADER */}
+                <div className="flex flex-col gap-1.5 border border-[var(--line)] rounded-xl p-4 bg-black/20">
+                  <label className="text-[9px] font-bold text-[var(--lime)] uppercase font-mono tracking-wider flex items-center justify-between">
+                    <span>Foto da Fachada / Visita</span>
+                    {photoUrl && <span className="text-[var(--lime)] font-mono text-[8px] uppercase">Carregada</span>}
+                  </label>
+                  
+                  <div className="flex items-center gap-3">
+                    <label className="flex-1 border border-dashed border-[var(--line)] rounded-xl p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer bg-black/10 hover:bg-black/30 transition-colors">
+                      <Camera size={18} className="text-[var(--lime)]" />
+                      <span className="text-[10px] font-mono text-[var(--gray)]">Tirar Foto / Carregar</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        capture="environment"
+                        className="hidden" 
+                        onChange={handlePhotoUpload}
+                      />
+                    </label>
+
+                    {photoUrl && (
+                      <div className="w-16 h-16 rounded-xl border border-[var(--line)] overflow-hidden shrink-0 relative bg-black/50">
+                        <img src={photoUrl} alt="Fachada" className="w-full h-full object-cover" />
+                        <button 
+                          type="button" 
+                          onClick={() => setPhotoUrl('')}
+                          className="absolute top-0 right-0 w-4 h-4 bg-black/80 rounded-bl text-[8px] font-bold text-red-500"
+                        >
+                          X
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Confirm Buttons */}
+                <div className="flex gap-3 border-t border-[var(--line)] pt-3 mt-auto">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowCheckinModal(false)}
+                    className="btn btn-secondary py-3 flex-1 text-xs font-bold uppercase tracking-wider"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    type="submit" 
+                    disabled={!selectedContactId}
+                    className="btn btn-primary py-3 flex-1 text-xs font-black uppercase tracking-wider text-black disabled:opacity-50"
+                  >
+                    Salvar Check-in
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ==================== ROLE: ADMIN / OUTROS (TRADITIONAL DASHBOARD) ====================
   return (
     <div className="page-content animate-fade-in w-full h-full flex flex-col gap-6">
       {/* Page Header */}
       <div className="flex items-center justify-between gap-4">
-        <h1 className="font-display text-2xl md:text-3xl text-[var(--white)] font-bold tracking-tight">
-          Dashboard
-        </h1>
+        <div>
+          <h1 className="font-display text-2xl md:text-3xl text-[var(--white)] font-bold tracking-tight">
+            Dashboard
+          </h1>
+          <p className="text-xs text-[var(--gray)] mt-1 font-mono">
+            Painel Geral de Vendas e Negócios Carton Pack.
+          </p>
+        </div>
       </div>
 
       {/* Filter Row */}
@@ -291,7 +752,7 @@ export default function DashboardPage() {
 
       {/* Bottom Grid Row: ABC Curve Analysis & Inactivity Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Alerta de Inatividade Clientes (briefing requirement: curve, inactive warnings) */}
+        {/* Alerta de Inatividade Clientes */}
         <div className="card p-6 lg:col-span-2">
           <h2 className="font-display text-sm mb-4 text-[var(--white)] flex items-center gap-3">
             <div className="section-header-icon">
