@@ -533,7 +533,7 @@ function ContactDrawer({
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">E-mail</label>
                         <input 
                           type="email" 
-                          className="input text-[9px] py-1.5 truncate" 
+                          className="input text-[8px] py-1.5 tracking-tight" 
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           onBlur={() => handleSaveGeneral()}
