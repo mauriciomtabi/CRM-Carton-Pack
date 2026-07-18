@@ -765,13 +765,11 @@ a, button, input, select, textarea {
   fill: currentColor;
   fill-opacity: 0;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 
 .stat-card:hover .stat-icon svg {
   fill-opacity: 0.15;
   transform: scale(1.12);
-  filter: none;
 }
 
 /* ══════════════ SECTION HEADER ICONS ══════════════ */
@@ -788,7 +786,6 @@ a, button, input, select, textarea {
   fill: currentColor;
   fill-opacity: 0;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 
 .card:hover .section-header-icon {
@@ -798,7 +795,6 @@ a, button, input, select, textarea {
 .card:hover .section-header-icon svg {
   fill-opacity: 0.15;
   transform: scale(1.12);
-  filter: none;
 }
 
 
