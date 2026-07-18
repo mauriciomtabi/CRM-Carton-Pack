@@ -41,10 +41,11 @@ const DEFAULT_USERS: TeamUser[] = [
 
 function formatPhoneBr(v: string) {
   const clean = v.replace(/\D/g, '')
-  if (clean.length <= 10) {
-    return clean.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3')
-  }
-  return clean.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3')
+  if (clean.length === 0) return ''
+  if (clean.length <= 2) return `(${clean}`
+  if (clean.length <= 6) return `(${clean.slice(0, 2)}) ${clean.slice(2)}`
+  if (clean.length <= 10) return `(${clean.slice(0, 2)}) ${clean.slice(2, 6)}-${clean.slice(6)}`
+  return `(${clean.slice(0, 2)}) ${clean.slice(2, 7)}-${clean.slice(7, 11)}`
 }
 
 export default function UsersPage() {
@@ -558,44 +559,46 @@ export default function UsersPage() {
                     className="input w-full pl-9 font-mono text-xs"
                     placeholder="(11) 98888-8888"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => setPhone(formatPhoneBr(e.target.value))}
                   />
                 </div>
               </div>
 
-              {/* Status */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Status Cadastral</label>
-                <div className="flex gap-4 p-3 border border-[var(--line)] rounded-xl bg-[var(--card)]">
-                  <label className="flex items-center gap-2 text-xs text-[var(--white)] cursor-pointer select-none">
-                    <input
-                      type="radio"
-                      name="modal-status"
-                      checked={status === 'ativo'}
-                      onChange={() => setStatus('ativo')}
-                      className="accent-[var(--lime)]"
-                    />
-                    <span className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--green)] inline-block"></span>
-                      Ativo (Acesso autorizado)
-                    </span>
-                  </label>
-                  
-                  <label className="flex items-center gap-2 text-xs text-[var(--white)] cursor-pointer select-none">
-                    <input
-                      type="radio"
-                      name="modal-status"
-                      checked={status === 'inativo'}
-                      onChange={() => setStatus('inativo')}
-                      className="accent-[var(--lime)]"
-                    />
-                    <span className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--red)] inline-block"></span>
-                      Inativo (Suspenso)
-                    </span>
-                  </label>
+              {/* Status (Only when editing) */}
+              {editingUser && (
+                <div className="flex flex-col gap-1.5 animate-fade-in">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Status Cadastral</label>
+                  <div className="flex gap-4 p-3 border border-[var(--line)] rounded-xl bg-[var(--card)]">
+                    <label className="flex items-center gap-2 text-xs text-[var(--white)] cursor-pointer select-none">
+                      <input
+                        type="radio"
+                        name="modal-status"
+                        checked={status === 'ativo'}
+                        onChange={() => setStatus('ativo')}
+                        className="accent-[var(--lime)]"
+                      />
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--green)] inline-block"></span>
+                        Ativo (Acesso autorizado)
+                      </span>
+                    </label>
+                    
+                    <label className="flex items-center gap-2 text-xs text-[var(--white)] cursor-pointer select-none">
+                      <input
+                        type="radio"
+                        name="modal-status"
+                        checked={status === 'inativo'}
+                        onChange={() => setStatus('inativo')}
+                        className="accent-[var(--lime)]"
+                      />
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--red)] inline-block"></span>
+                        Inativo (Suspenso)
+                      </span>
+                    </label>
+                  </div>
                 </div>
-              </div>
+              )}
 
             </div>
 
