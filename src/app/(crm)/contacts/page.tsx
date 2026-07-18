@@ -909,8 +909,8 @@ function NewContactModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <div className="md:col-span-2 flex flex-col gap-1">
+              <div className="grid grid-cols-4 md:grid-cols-5 gap-3">
+                <div className="col-span-2 flex flex-col gap-1">
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Endereço de Correspondência</label>
                   <input 
                     type="text" 
@@ -937,11 +937,26 @@ function NewContactModal({
                   <input 
                     type="text" 
                     maxLength={2}
-                    className="input text-xs py-1.5 uppercase text-center font-bold font-mono" 
+                    className="input text-xs py-1.5 uppercase text-center font-bold font-mono w-full" 
                     placeholder="UF"
                     value={state}
                     onChange={(e) => setState(e.target.value.toUpperCase())}
                   />
+                </div>
+
+                {/* Map icon button */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-transparent uppercase font-mono tracking-wider select-none">.</label>
+                  <a
+                    href={(address || city) ? `https://www.openstreetmap.org/search?query=${encodeURIComponent([address, city, state].filter(Boolean).join(', '))}` : '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Ver endereço no mapa"
+                    className={`flex items-center justify-center gap-1.5 rounded-lg border py-1.5 text-[9px] font-bold uppercase font-mono tracking-wider transition-colors ${(address || city) ? 'border-sky-500/40 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20 hover:text-sky-200 cursor-pointer' : 'border-[var(--line)] text-[var(--gray2)] opacity-40 pointer-events-none'}`}
+                  >
+                    <MapPin size={12} />
+                    <span>Mapa</span>
+                  </a>
                 </div>
               </div>
             </div>
