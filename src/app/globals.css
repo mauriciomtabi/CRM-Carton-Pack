@@ -35,6 +35,15 @@
   --text-muted:     var(--gray2);
   --brand:          var(--lime);
 
+  /* ── Opacidades e Hovers Semânticos ── */
+  --opacity-hover:          rgba(255, 255, 255, 0.04);
+  --opacity-hover-heavy:    rgba(255, 255, 255, 0.08);
+  --opacity-border-light:   rgba(255, 255, 255, 0.06);
+  --opacity-border-medium:  rgba(255, 255, 255, 0.12);
+  --opacity-3:              rgba(255, 255, 255, 0.03);
+  --opacity-5:              rgba(255, 255, 255, 0.05);
+  --opacity-10:             rgba(255, 255, 255, 0.10);
+
   /* ── Estágios do pipeline ── */
   --stage-leads:      #555;
   --stage-prospect:   #3b82f6;
@@ -52,6 +61,30 @@
   --shadow-md:    0 4px 24px rgba(0,0,0,0.7);
   --shadow-lg:    0 8px 48px rgba(0,0,0,0.85);
   --shadow-lime:  0 8px 32px rgba(180,217,50,0.35);
+}
+
+[data-theme="light"] {
+  --black:     #f8fafc;
+  --charcoal:  #ffffff;
+  --card:      #ffffff;
+  --card2:     #f1f5f9;
+  --line:      #e2e8f0;
+  --white:     #0f172a;
+  --gray:      #475569;
+  --gray2:     #94a3b8;
+
+  --opacity-hover:          rgba(15, 23, 42, 0.04);
+  --opacity-hover-heavy:    rgba(15, 23, 42, 0.08);
+  --opacity-border-light:   rgba(15, 23, 42, 0.06);
+  --opacity-border-medium:  rgba(15, 23, 42, 0.12);
+  --opacity-3:              rgba(15, 23, 42, 0.03);
+  --opacity-5:              rgba(15, 23, 42, 0.05);
+  --opacity-10:             rgba(15, 23, 42, 0.10);
+
+  --shadow-sm:    0 2px 8px rgba(15,23,42,0.04);
+  --shadow-md:    0 4px 24px rgba(15,23,42,0.08);
+  --shadow-lg:    0 8px 48px rgba(15,23,42,0.12);
+  --shadow-lime:  0 8px 32px rgba(126,160,8,0.15);
 }
 
 /* ══════════════ RESET ══════════════ */
@@ -204,7 +237,7 @@ a, button, input, select, textarea {
 }
 
 .nav-item:hover {
-  background: rgba(255,255,255,0.04);
+  background: var(--opacity-hover);
   color: var(--white);
 }
 
@@ -357,7 +390,7 @@ a, button, input, select, textarea {
   border: 1px solid transparent;
 }
 .btn-ghost:hover {
-  background: rgba(255,255,255,0.04);
+  background: var(--opacity-hover);
   color: var(--white);
 }
 
@@ -425,9 +458,9 @@ a, button, input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--opacity-3);
   color: var(--col-color, var(--white));
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--opacity-5);
   flex-shrink: 0;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -472,9 +505,7 @@ a, button, input, select, textarea {
   font-family: var(--font-brand), sans-serif;
   font-size: 11px;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 99px;
-  background: rgba(255,255,255,0.05);
+  background: var(--opacity-5);
   color: var(--gray);
   flex-shrink: 0;
 }
@@ -490,7 +521,7 @@ a, button, input, select, textarea {
 
 .kanban-empty {
   margin: 4px;
-  border: 1px dashed rgba(255,255,255,0.06);
+  border: 1px dashed var(--opacity-border-light);
   border-radius: 8px;
   padding: 20px 12px;
   text-align: center;
@@ -563,7 +594,7 @@ a, button, input, select, textarea {
 
 .deal-card:hover {
   background: var(--card2);
-  border-color: rgba(255,255,255,0.12);
+  border-color: var(--opacity-border-medium);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
@@ -632,7 +663,7 @@ a, button, input, select, textarea {
   border-radius: 99px;
 }
 
-.deal-time.ok      { color: var(--gray2); background: rgba(255,255,255,0.04); }
+.deal-time.ok      { color: var(--gray2); background: var(--opacity-hover); }
 .deal-time.warning { color: #f0c419;      background: rgba(240,196,25,0.10); }
 .deal-time.danger  { color: #e2483d;      background: rgba(226,72,61,0.12); }
 
@@ -656,7 +687,7 @@ a, button, input, select, textarea {
   border-radius: 12px;
 }
 
-.card:hover { border-color: rgba(255,255,255,0.1); }
+.card:hover { border-color: var(--opacity-10); }
 
 /* ══════════════ STAT CARD ══════════════ */
 .stat-card {
@@ -683,7 +714,7 @@ a, button, input, select, textarea {
 }
 
 .stat-card:hover {
-  border-color: rgba(255,255,255,0.1);
+  border-color: var(--opacity-10);
   transform: translateY(-2px);
 }
 

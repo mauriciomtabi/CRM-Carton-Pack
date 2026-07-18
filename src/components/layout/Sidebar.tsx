@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import {
   LayoutDashboard,
   KanbanSquare,
@@ -10,6 +11,8 @@ import {
   BarChart3,
   Settings,
   LogOut,
+  Sun,
+  Moon,
 } from 'lucide-react'
 
 const navItems = [
@@ -24,6 +27,19 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+
+  useEffect(() => {
+    const activeTheme = (document.documentElement.getAttribute('data-theme') || 'dark') as 'dark' | 'light'
+    setTheme(activeTheme)
+  }, [])
+
+  function toggleTheme() {
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(newTheme)
+    document.documentElement.setAttribute('data-theme', newTheme)
+    localStorage.setItem('theme', newTheme)
+  }
 
   async function handleLogout() {
     router.push('/login')
@@ -81,8 +97,18 @@ export function Sidebar() {
       {/* Footer */}
       <div className="sidebar-footer">
         <button
+          onClick={toggleTheme}
+          className="nav-item text-left border-none bg-none cursor-pointer w-full mb-1"
+        >
+          <div className="nav-item-icon">
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </div>
+          <span>Modo {theme === 'dark' ? 'Claro' : 'Escuro'}</span>
+        </button>
+
+        <button
           onClick={handleLogout}
-          className="nav-item text-left border-none bg-none cursor-pointer"
+          className="nav-item text-left border-none bg-none cursor-pointer w-full"
         >
           <div className="nav-item-icon">
             <LogOut size={18} />
