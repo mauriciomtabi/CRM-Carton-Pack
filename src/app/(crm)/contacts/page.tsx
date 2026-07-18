@@ -772,99 +772,202 @@ function NewContactModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-      <form onSubmit={handleSubmit} className="bg-[var(--charcoal)] border border-[var(--line)] rounded-2xl p-6 w-full max-w-5xl shadow-2xl flex flex-col gap-4 animate-fade-up">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+      <form onSubmit={handleSubmit} className="bg-[var(--charcoal)] border border-[var(--line)] rounded-2xl p-6 w-full max-w-6xl shadow-2xl flex flex-col gap-4 animate-fade-up">
         
-        <div className="flex justify-between items-start">
+        {/* Header */}
+        <div className="flex justify-between items-start border-b border-[var(--line)] pb-3">
           <div>
             <h3 className="font-display text-base text-[var(--white)] font-bold">Cadastrar Novo Cliente</h3>
-            <p className="text-xs text-[var(--gray)] mt-0.5">Insira o CNPJ da empresa para realizar o preenchimento automático das fichas fiscais.</p>
+            <p className="text-xs text-[var(--gray)] mt-0.5 font-mono">Preenchimento automático inteligente integrado com a API do CNPJá e CNPJ.ws</p>
           </div>
           <button type="button" onClick={onCancel} className="text-gray-400 hover:text-[var(--white)] p-1 rounded-md hover:bg-[var(--line)] transition-colors">
             <X size={18} />
           </button>
         </div>
 
-        {/* CNPJ Input Header */}
-        <div className="flex flex-col gap-1.5 max-w-md">
-          <label className="label">Buscar CNPJ</label>
-          <div className="flex gap-2">
-            <input 
-              type="text" 
-              className="input font-mono flex-1" 
-              placeholder="Ex: 00.000.000/0001-00"
-              value={rawCnpj}
-              onChange={(e) => setRawCnpj(formatCnpj(e.target.value))}
-            />
-            <button 
-              type="button"
-              disabled={loadingCnpj}
-              onClick={handleFetchCnpj}
-              className="btn btn-secondary py-2.5 px-4 text-xs font-bold uppercase tracking-wider"
-            >
-              {loadingCnpj ? 'Buscando...' : 'Buscar'}
-            </button>
-          </div>
-          {cnpjError && <span className="text-[10px] text-[var(--red)] font-semibold">{cnpjError}</span>}
+        {/* CNPJ Search Bar */}
+        <div className="flex items-center gap-3 bg-[var(--card)] border border-[var(--line)] p-2.5 rounded-xl max-w-md">
+          <label className="text-[10px] font-mono font-bold text-[var(--lime)] uppercase tracking-wider whitespace-nowrap">Buscar CNPJ:</label>
+          <input 
+            type="text" 
+            className="input font-mono bg-[var(--charcoal)] flex-1 text-xs py-1" 
+            placeholder="Ex: 00.000.000/0001-00"
+            value={rawCnpj}
+            onChange={(e) => setRawCnpj(formatCnpj(e.target.value))}
+          />
+          <button 
+            type="button"
+            disabled={loadingCnpj}
+            onClick={handleFetchCnpj}
+            className="btn btn-primary py-1 px-3 text-[10px] font-bold uppercase tracking-wider text-[#060606]"
+          >
+            {loadingCnpj ? 'Buscando...' : 'Buscar'}
+          </button>
         </div>
+        {cnpjError && <span className="text-[10px] text-[var(--red)] font-semibold -mt-2">{cnpjError}</span>}
 
-        {/* Vertical stacked layout with a grid for responsive widths */}
-        <div className="flex flex-col gap-6 border-t border-[var(--line)] pt-4 max-h-[64vh] overflow-y-auto pr-2">
+        {/* Dashboard 2-Column Split Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 border-t border-[var(--line)] pt-4 max-h-[64vh] overflow-y-auto pr-1">
           
-          {/* SEC 1: IDENTIFICAÇÃO */}
-          <div className="flex flex-col gap-4">
-            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1">Dados Cadastrais</h4>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="col-span-1 md:col-span-4 flex flex-col gap-1.5">
-                <label className="label">Razão Social / Empresa *</label>
+          {/* LEFT COLUMN (2/3 width): Cadastral Info and CNAE */}
+          <div className="lg:col-span-2 flex flex-col gap-4">
+            
+            {/* Card 1: Identificação Geral */}
+            <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
+              <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Dados Cadastrais</h4>
+              
+              <div className="flex flex-col gap-1">
+                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Razão Social / Empresa *</label>
                 <input 
                   type="text" 
                   required
-                  className="input font-bold" 
+                  className="bg-transparent border-b border-dashed border-[var(--line)] focus:border-[var(--lime)] font-display text-sm text-[var(--white)] font-bold w-full pb-1 focus:outline-none"
                   placeholder="Nome da Empresa"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                 />
               </div>
 
-              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
-                <label className="label">Nome Fantasia</label>
-                <input 
-                  type="text" 
-                  className="input" 
-                  placeholder="Nome Fantasia"
-                  value={tradeName}
-                  onChange={(e) => setTradeName(e.target.value)}
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Nome Fantasia</label>
+                  <input 
+                    type="text" 
+                    className="input text-xs py-1.5" 
+                    placeholder="Nome Fantasia"
+                    value={tradeName}
+                    onChange={(e) => setTradeName(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--lime)] uppercase font-mono tracking-wider">Responsável (Pessoa Física) *</label>
+                  <input 
+                    type="text" 
+                    required
+                    className="input text-xs py-1.5 font-bold border-dashed border-[var(--lime)]" 
+                    placeholder="Nome do Contato Principal"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
               </div>
 
-              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
-                <label className="label">Responsável (Pessoa Física) *</label>
-                <input 
-                  type="text" 
-                  required
-                  className="input font-bold border-dashed border-[var(--lime)]" 
-                  placeholder="Nome do Contato Principal"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CNPJ</label>
+                  <input 
+                    type="text" 
+                    className="input text-xs py-1.5 font-mono" 
+                    placeholder="00.000.000/0001-00"
+                    value={cnpj}
+                    onChange={(e) => setCnpj(formatCnpj(e.target.value))}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Telefone</label>
+                  <input 
+                    type="text" 
+                    className="input text-xs py-1.5" 
+                    placeholder="(00) 00000-0000"
+                    value={phone}
+                    onChange={(e) => setPhone(formatPhoneBr(e.target.value))}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">E-mail</label>
+                  <input 
+                    type="email" 
+                    className="input text-xs py-1.5" 
+                    placeholder="contato@empresa.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
               </div>
 
-              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
-                <label className="label">CNPJ</label>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="md:col-span-2 flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Endereço de Correspondência</label>
+                  <input 
+                    type="text" 
+                    className="input text-xs py-1.5" 
+                    placeholder="Rua, Número, Bairro"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Cidade</label>
+                  <input 
+                    type="text" 
+                    className="input text-xs py-1.5" 
+                    placeholder="Cidade"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">UF</label>
+                  <input 
+                    type="text" 
+                    maxLength={2}
+                    className="input text-xs py-1.5 uppercase text-center font-bold font-mono" 
+                    placeholder="UF"
+                    value={state}
+                    onChange={(e) => setState(e.target.value.toUpperCase())}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Atividade Principal */}
+            <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
+              <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Atividades Econômicas</h4>
+              <div className="flex flex-col gap-1">
+                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CNAE Principal</label>
                 <input 
                   type="text" 
-                  className="input font-mono" 
-                  placeholder="00.000.000/0001-00"
-                  value={cnpj}
-                  onChange={(e) => setCnpj(formatCnpj(e.target.value))}
+                  className="input text-xs py-1.5" 
+                  placeholder="CNAE e Descrição"
+                  value={mainCnae}
+                  onChange={(e) => setMainCnae(e.target.value)}
                 />
               </div>
+            </div>
 
-              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
-                <label className="label">Curva ABC</label>
+          </div>
+
+          {/* RIGHT COLUMN (1/3 width): Fisco, Tributário and Curve */}
+          <div className="flex flex-col gap-4">
+            
+            {/* Card 3: Regime Tributário */}
+            <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
+              <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Regime Tributário</h4>
+              
+              <div className="flex flex-col gap-1">
+                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Regime Tributário</label>
                 <select 
-                  className="input" 
+                  className="input text-xs py-1.5" 
+                  value={taxRegime} 
+                  onChange={(e) => setTaxRegime(e.target.value as any)}
+                >
+                  <option value="MEI">MEI</option>
+                  <option value="Simples Nacional">Simples Nacional</option>
+                  <option value="Lucro Presumido">Lucro Presumido</option>
+                  <option value="Lucro Real">Lucro Real</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Curva ABC</label>
+                <select 
+                  className="input text-xs py-1.5" 
                   value={curve} 
                   onChange={(e) => setCurve(e.target.value as any)}
                 >
@@ -875,164 +978,75 @@ function NewContactModal({
                 </select>
               </div>
             </div>
-          </div>
 
-          {/* SEC 2: FISCAL */}
-          <div className="flex flex-col gap-4">
-            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1">Informações Fiscais</h4>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Card 4: Fisco e Inscrições */}
+            <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
+              <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Inscrições Estaduais e Status</h4>
               
-              {/* Row 1: Situação Cadastral, Regime Tributário, Inscrição Estadual side-by-side */}
-              <div className="col-span-1 md:col-span-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Situação Cadastral</label>
+              <div className="flex flex-col gap-1">
+                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Situação Cadastral</label>
+                <input 
+                  type="text" 
+                  className="input text-xs py-1.5 font-bold" 
+                  placeholder="Ex: ATIVA"
+                  style={{ color: registrationStatus.includes('ATIVA') || registrationStatus.includes('Ativa') ? 'var(--green)' : 'var(--white)' }}
+                  value={registrationStatus}
+                  onChange={(e) => setRegistrationStatus(e.target.value)}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Inscrição Estadual (IE)</label>
+                <input 
+                  type="text" 
+                  className="input text-xs py-1.5 font-mono" 
+                  placeholder="Preencher manualmente se houver"
+                  value={stateRegistration}
+                  onChange={(e) => setStateRegistration(e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Situação Especial</label>
                   <input 
                     type="text" 
-                    className="input font-bold" 
-                    placeholder="Ex: ATIVA"
-                    style={{ color: registrationStatus.includes('ATIVA') ? 'var(--green)' : 'var(--white)' }}
-                    value={registrationStatus}
-                    onChange={(e) => setRegistrationStatus(e.target.value)}
+                    className="input text-xs py-1.5" 
+                    placeholder="Nenhuma"
+                    value={specialSituation}
+                    onChange={(e) => setSpecialSituation(e.target.value)}
                   />
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Regime Tributário</label>
-                  <select 
-                    className="input" 
-                    value={taxRegime} 
-                    onChange={(e) => setTaxRegime(e.target.value as any)}
-                  >
-                    <option value="MEI">MEI</option>
-                    <option value="Simples Nacional">Simples Nacional</option>
-                    <option value="Lucro Presumido">Lucro Presumido</option>
-                    <option value="Lucro Real">Lucro Real</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Inscrição Estadual</label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Data Situação</label>
                   <input 
                     type="text" 
-                    className="input font-mono" 
-                    placeholder="Preencher manualmente se houver"
-                    value={stateRegistration}
-                    onChange={(e) => setStateRegistration(e.target.value)}
+                    className="input text-xs py-1.5" 
+                    placeholder="-"
+                    value={specialSituationDate}
+                    onChange={(e) => setSpecialSituationDate(e.target.value)}
                   />
                 </div>
               </div>
-
-              <div className="col-span-1 md:col-span-4 flex flex-col gap-1.5">
-                <label className="label">CNAE Principal</label>
-                <input 
-                  type="text" 
-                  className="input text-xs" 
-                  placeholder="CNAE e Descrição"
-                  value={mainCnae}
-                  onChange={(e) => setMainCnae(e.target.value)}
-                />
-              </div>
-
-              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
-                <label className="label">Situação Especial</label>
-                <input 
-                  type="text" 
-                  className="input" 
-                  placeholder="Nenhuma"
-                  value={specialSituation}
-                  onChange={(e) => setSpecialSituation(e.target.value)}
-                />
-              </div>
-
-              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
-                <label className="label">Data Situação Especial</label>
-                <input 
-                  type="text" 
-                  className="input" 
-                  placeholder="-"
-                  value={specialSituationDate}
-                  onChange={(e) => setSpecialSituationDate(e.target.value)}
-                />
-              </div>
             </div>
-          </div>
 
-          {/* SEC 3: ENDEREÇO & CONTATO */}
-          <div className="flex flex-col gap-4">
-            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1">Endereço e Contato</h4>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
-                <label className="label">Telefone</label>
-                <input 
-                  type="text" 
-                  className="input" 
-                  placeholder="(00) 00000-0000"
-                  value={phone}
-                  onChange={(e) => setPhone(formatPhoneBr(e.target.value))}
-                />
-              </div>
-
-              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
-                <label className="label">E-mail</label>
-                <input 
-                  type="email" 
-                  className="input" 
-                  placeholder="contato@empresa.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-
-              <div className="col-span-1 md:col-span-4 flex flex-col gap-1.5">
-                <label className="label">Endereço de Correspondência</label>
-                <input 
-                  type="text" 
-                  className="input text-xs" 
-                  placeholder="Rua, Número, Bairro - CEP"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-              </div>
-
-              <div className="col-span-1 md:col-span-3 flex flex-col gap-1.5">
-                <label className="label">Cidade</label>
-                <input 
-                  type="text" 
-                  className="input" 
-                  placeholder="Sapiranga"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                />
-              </div>
-
-              <div className="col-span-1 md:col-span-1 flex flex-col gap-1.5">
-                <label className="label">UF</label>
-                <input 
-                  type="text" 
-                  maxLength={2}
-                  className="input uppercase text-center font-bold font-mono" 
-                  placeholder="RS"
-                  value={state}
-                  onChange={(e) => setState(e.target.value.toUpperCase())}
-                />
-              </div>
-            </div>
           </div>
 
         </div>
 
         {/* Footer Actions */}
-        <div className="flex justify-end gap-3 mt-2 border-t border-[var(--line)] pt-3">
+        <div className="flex justify-end gap-3 border-t border-[var(--line)] pt-3">
           <button 
             type="button" 
             onClick={onCancel}
-            className="btn btn-secondary py-2.5 px-4 text-xs font-bold uppercase tracking-wider"
+            className="btn btn-secondary py-2 px-4 text-xs font-bold uppercase tracking-wider"
           >
             Cancelar
           </button>
           <button 
             type="submit" 
-            className="btn btn-primary py-2.5 px-4 text-xs font-bold uppercase tracking-wider text-[#060606]"
+            className="btn btn-primary py-2 px-4 text-xs font-bold uppercase tracking-wider text-[#060606]"
           >
             Confirmar Cadastro
           </button>
