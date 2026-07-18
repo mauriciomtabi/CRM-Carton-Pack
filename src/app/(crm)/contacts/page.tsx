@@ -59,9 +59,88 @@ interface Activity {
 }
 
 const MOCK_CONTACTS: MockContact[] = [
-  { id: '1', name: 'Alvaro Ferreira', company: 'Gota Limpa Indústria', cnpj: '12.345.678/0001-90', curve: 'A', representative: 'Ermínio', lastPurchaseDays: 95, phone: '(51) 99999-9999', city: 'Sapiranga', state: 'RS', status: 'inativo', email: 'alvaro@gotalimpa.com', tradeName: 'Gota Limpa', registrationStatus: 'ATIVA desde 30/03/2006', mainCnae: '2061-6/00 - Fabricação de sabões e detergentes sintéticos', address: 'Av. Industrial, 4500 - Bairro Industrial - CEP: 93800-000 - Sapiranga/RS', taxRegime: 'Simples Nacional', specialSituation: 'Nenhuma', specialSituationDate: '-', stateRegistration: '112/0034455' },
-  { id: '2', name: 'Ana Lima', company: 'Natura Cosméticos', cnpj: '98.765.432/0001-10', curve: 'A', representative: 'Ana Lima', lastPurchaseDays: 15, phone: '(11) 98888-8888', city: 'São Paulo', state: 'SP', status: 'ativo', email: 'compras@natura.com.br', tradeName: 'Natura', registrationStatus: 'ATIVA desde 15/10/1990', mainCnae: '2063-3/00 - Fabricação de cosméticos, produtos de perfumaria e de higiene pessoal', address: 'Av. Alexandre Colares, 1188 - Parque Anhanguera - CEP: 05106-000 - São Paulo/SP', taxRegime: 'Lucro Real', specialSituation: 'Nenhuma', specialSituationDate: '-', stateRegistration: '108/9988776' },
-  { id: '3', name: 'Carlos Mendes', company: 'XP Presentes', cnpj: '11.222.333/0001-44', curve: 'B', representative: 'Carlos Mendes', lastPurchaseDays: 30, phone: '(21) 97777-7777', city: 'Rio de Janeiro', state: 'RJ', status: 'ativo', email: 'carlos@xppresentes.com', tradeName: 'XP Presentes', registrationStatus: 'ATIVA desde 02/07/2015', mainCnae: '4789-0/01 - Comércio varejista de suvenires, bijuterias e artesanatos', address: 'Av. Rio Branco, 156 - Centro - CEP: 20040-003 - Rio de Janeiro/RJ', taxRegime: 'Simples Nacional', specialSituation: 'Nenhuma', specialSituationDate: '-', stateRegistration: '205/6677889' },
+  { 
+    id: '1', 
+    name: 'Alvaro Ferreira', 
+    company: 'Gota Limpa Indústria', 
+    cnpj: '12.345.678/0001-90', 
+    curve: 'A', 
+    representative: 'Ermínio', 
+    lastPurchaseDays: 95, 
+    phone: '(51) 99999-9999', 
+    city: 'Sapiranga', 
+    state: 'RS', 
+    status: 'inativo', 
+    email: 'alvaro@gotalimpa.com', 
+    tradeName: 'Gota Limpa', 
+    registrationStatus: 'ATIVA desde 30/03/2006', 
+    mainCnae: '2061-6/00 - Fabricação de sabões e detergentes sintéticos', 
+    address: 'Av. Industrial, 4500', 
+    bairro: 'Bairro Industrial',
+    cep: '93800-000',
+    taxRegime: 'Simples Nacional', 
+    specialSituation: 'Nenhuma', 
+    specialSituationDate: '-', 
+    stateRegistration: '112/0034455',
+    sideActivities: [
+      { id: '2062-4/00', text: 'Fabricação de sabões e detergentes sintéticos' },
+      { id: '2063-2/00', text: 'Fabricação de cosméticos, produtos de perfumaria e de higiene pessoal' }
+    ]
+  },
+  { 
+    id: '2', 
+    name: 'Ana Lima', 
+    company: 'Natura Cosméticos', 
+    cnpj: '98.765.432/0001-10', 
+    curve: 'A', 
+    representative: 'Ana Lima', 
+    lastPurchaseDays: 15, 
+    phone: '(11) 98888-8888', 
+    city: 'São Paulo', 
+    state: 'SP', 
+    status: 'ativo', 
+    email: 'compras@natura.com.br', 
+    tradeName: 'Natura', 
+    registrationStatus: 'ATIVA desde 15/10/1990', 
+    mainCnae: '2063-3/00 - Fabricação de cosméticos, produtos de perfumaria e de higiene pessoal', 
+    address: 'Av. Alexandre Colares, 1188', 
+    bairro: 'Parque Anhanguera',
+    cep: '05106-000',
+    taxRegime: 'Lucro Real', 
+    specialSituation: 'Nenhuma', 
+    specialSituationDate: '-', 
+    stateRegistration: '108/9988776',
+    sideActivities: [
+      { id: '2061-6/00', text: 'Fabricação de sabões e detergentes sintéticos' }
+    ]
+  },
+  { 
+    id: '3', 
+    name: 'Carlos Mendes', 
+    company: 'XP Presentes', 
+    cnpj: '11.222.333/0001-44', 
+    curve: 'B', 
+    representative: 'Carlos Mendes', 
+    lastPurchaseDays: 30, 
+    phone: '(21) 97777-7777', 
+    city: 'Rio de Janeiro', 
+    state: 'RJ', 
+    status: 'ativo', 
+    email: 'carlos@xppresentes.com', 
+    tradeName: 'XP Presentes', 
+    registrationStatus: 'ATIVA desde 02/07/2015', 
+    mainCnae: '4789-0/01 - Comércio varejista de suvenires, bijuterias e artesanatos', 
+    address: 'Av. Rio Branco, 156', 
+    bairro: 'Centro',
+    cep: '20040-003',
+    taxRegime: 'Simples Nacional', 
+    specialSituation: 'Nenhuma', 
+    specialSituationDate: '-', 
+    stateRegistration: '205/6677889',
+    sideActivities: [
+      { id: '4789-0/99', text: 'Comércio varejista de outros produtos não especificados anteriormente' }
+    ]
+  },
 ]
 
 function formatCnpj(v: string) {
@@ -414,8 +493,8 @@ function ContactDrawer({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col md:flex-row gap-3">
+                      <div className="flex flex-col gap-1.5 md:w-[130px] shrink-0">
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CNPJ</label>
                         <input 
                           type="text" 
@@ -426,7 +505,7 @@ function ContactDrawer({
                         />
                       </div>
 
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-1.5 md:w-[120px] shrink-0">
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Telefone</label>
                         <input 
                           type="text" 
@@ -437,11 +516,11 @@ function ContactDrawer({
                         />
                       </div>
 
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">E-mail</label>
                         <input 
                           type="email" 
-                          className="input text-xs py-1.5" 
+                          className="input text-[11px] py-1.5 truncate" 
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           onBlur={() => handleSaveGeneral()}
@@ -561,10 +640,10 @@ function ContactDrawer({
                           href={`https://cnpja.com/office/${cnpj.replace(/\D/g, '')}`} 
                           target="_blank" 
                           rel="noopener noreferrer" 
-                          className="text-[9px] font-bold text-[var(--lime)] hover:text-white uppercase tracking-wider font-mono flex items-center gap-1 transition-colors"
+                          title="Ver no CNPJá"
+                          className="text-[9px] font-bold text-[var(--gray2)] hover:text-[var(--lime)] transition-colors p-1"
                         >
-                          <span>Ver no CNPJá</span>
-                          <ExternalLink size={10} />
+                          <ExternalLink size={12} />
                         </a>
                       )}
                     </div>
@@ -592,23 +671,23 @@ function ContactDrawer({
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="flex flex-col gap-1">
+                    <div className="flex gap-3">
+                      <div className="flex flex-col gap-1 flex-1 min-w-0">
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Situação Especial</label>
                         <input 
                           type="text" 
-                          className="input text-xs py-1.5" 
+                          className="input text-[11px] py-1.5 truncate" 
                           value={specialSituation}
                           onChange={(e) => setSpecialSituation(e.target.value)}
                           onBlur={() => handleSaveGeneral()}
                         />
                       </div>
 
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1 w-[90px] shrink-0">
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Data Situação</label>
                         <input 
                           type="text" 
-                          className="input text-xs py-1.5" 
+                          className="input text-[11px] py-1.5 text-center font-mono" 
                           value={specialSituationDate}
                           onChange={(e) => setSpecialSituationDate(e.target.value)}
                           onBlur={() => handleSaveGeneral()}
