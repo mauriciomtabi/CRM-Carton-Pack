@@ -166,7 +166,7 @@ export default function DashboardPage() {
             <div className="stat-label">Negócios Ativos</div>
           </div>
           <div className="stat-icon">
-            <Package size={26} className="text-[var(--lime)]" />
+            <Package size={32} className="text-[var(--lime)]" />
           </div>
         </div>
 
@@ -176,7 +176,7 @@ export default function DashboardPage() {
             <div className="stat-label">Fechamentos (mês)</div>
           </div>
           <div className="stat-icon">
-            <CheckCircle size={26} className="text-[var(--green)]" />
+            <CheckCircle size={32} className="text-[var(--green)]" />
           </div>
         </div>
 
@@ -186,7 +186,7 @@ export default function DashboardPage() {
             <div className="stat-label">Em Negociação</div>
           </div>
           <div className="stat-icon">
-            <TrendingUp size={26} className="text-[var(--yellow)]" />
+            <TrendingUp size={32} className="text-[var(--yellow)]" />
           </div>
         </div>
 
@@ -196,7 +196,7 @@ export default function DashboardPage() {
             <div className="stat-label">Perdidos (mês)</div>
           </div>
           <div className="stat-icon">
-            <XCircle size={26} className="text-[var(--red)]" />
+            <XCircle size={32} className="text-[var(--red)]" />
           </div>
         </div>
       </div>
@@ -207,7 +207,7 @@ export default function DashboardPage() {
         <div className="card p-6 lg:col-span-2">
           <h2 className="font-display text-sm mb-6 text-[var(--white)] flex items-center gap-3">
             <div className="section-header-icon">
-              <TrendingUp size={16} />
+              <TrendingUp size={20} />
             </div>
             Funil de Vendas
           </h2>
@@ -245,7 +245,7 @@ export default function DashboardPage() {
           <div>
             <h2 className="font-display text-sm mb-4 text-[var(--white)] flex items-center gap-3">
               <div className="section-header-icon">
-                <AlertTriangle size={16} className="text-[var(--yellow)]" />
+                <AlertTriangle size={20} />
               </div>
               Negócios Parados
             </h2>
@@ -298,7 +298,7 @@ export default function DashboardPage() {
         <div className="card p-6 lg:col-span-2">
           <h2 className="font-display text-sm mb-4 text-[var(--white)] flex items-center gap-3">
             <div className="section-header-icon">
-              <AlertTriangle size={16} className="text-[var(--red)]" />
+              <AlertTriangle size={20} />
             </div>
             Alertas de Inatividade (Recorrência Excedida)
           </h2>
@@ -355,7 +355,7 @@ export default function DashboardPage() {
           <div>
             <h2 className="font-display text-sm mb-4 text-[var(--white)] flex items-center gap-3">
               <div className="section-header-icon">
-                <Package size={16} className="text-[var(--lime)]" />
+                <Package size={20} />
               </div>
               Distribuição Curva ABC
             </h2>

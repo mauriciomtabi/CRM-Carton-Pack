@@ -738,11 +738,6 @@ a, button, input, select, textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--charcoal);
-  border: 1px solid var(--line);
   color: var(--gray);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
@@ -752,18 +747,17 @@ a, button, input, select, textarea {
   fill: currentColor;
   fill-opacity: 0;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 
 .card:hover .section-header-icon {
   color: var(--lime);
-  background: rgba(180, 217, 50, 0.08);
-  border-color: rgba(180, 217, 50, 0.2);
-  box-shadow: 0 0 12px rgba(180, 217, 50, 0.2);
 }
 
 .card:hover .section-header-icon svg {
-  fill-opacity: 0.2;
-  transform: scale(1.06);
+  fill-opacity: 0.22;
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 10px var(--lime)) drop-shadow(0 2px 8px rgba(0,0,0,0.5));
 }
 
 
