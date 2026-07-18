@@ -726,7 +726,7 @@ export default function ContactsPage() {
           Carteira de Clientes
         </h1>
 
-        <button onClick={() => setShowNewContactModal(true)} className="btn btn-primary self-start md:self-auto">
+        <button onClick={() => setShowNewContactModal(true)} className="btn btn-primary btn-sm self-start md:self-auto">
           <Plus size={14} />
           <span>Novo Cliente</span>
         </button>
