@@ -418,7 +418,6 @@ a, button, input, select, textarea {
   border-bottom: 1px solid var(--line);
   flex-shrink: 0;
 }
-
 .kanban-col-icon {
   width: 28px;
   height: 28px;
@@ -426,9 +425,28 @@ a, button, input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--col-color, var(--white));
+  border: 1px solid rgba(255, 255, 255, 0.05);
   flex-shrink: 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kanban-col-icon svg {
+  fill: currentColor;
+  fill-opacity: 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kanban-col:hover .kanban-col-icon {
+  background: color-mix(in srgb, var(--col-color) 12%, transparent);
+  border-color: color-mix(in srgb, var(--col-color) 25%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--col-color) 20%, transparent);
+}
+
+.kanban-col:hover .kanban-col-icon svg {
+  fill-opacity: 0.22;
+  transform: scale(1.05);
 }
 
 .kanban-col-info { flex: 1; min-width: 0; }
@@ -679,24 +697,26 @@ a, button, input, select, textarea {
 
 .stat-label {
   font-family: var(--font-brand), sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--gray);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--white);
+  opacity: 0.55;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-top: 6px;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover .stat-label {
+  opacity: 0.95;
 }
 
 .stat-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: var(--stat-glow-bg, rgba(255, 255, 255, 0.02));
-  border: 1px solid var(--line);
+  color: var(--stat-color, var(--lime));
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -704,17 +724,13 @@ a, button, input, select, textarea {
   fill: currentColor;
   fill-opacity: 0;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.stat-card:hover .stat-icon {
-  background: var(--stat-glow-bg);
-  border-color: var(--stat-glow-border);
-  box-shadow: 0 0 15px var(--stat-glow-color);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 
 .stat-card:hover .stat-icon svg {
-  fill-opacity: 0.25;
-  transform: scale(1.08);
+  fill-opacity: 0.22;
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 10px var(--stat-color)) drop-shadow(0 2px 8px rgba(0,0,0,0.5));
 }
 
 /* ══════════════ SECTION HEADER ICONS ══════════════ */

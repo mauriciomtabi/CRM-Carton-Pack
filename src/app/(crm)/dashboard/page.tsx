@@ -166,7 +166,7 @@ export default function DashboardPage() {
             <div className="stat-label">Negócios Ativos</div>
           </div>
           <div className="stat-icon">
-            <Package size={20} className="text-[var(--lime)]" />
+            <Package size={26} className="text-[var(--lime)]" />
           </div>
         </div>
 
@@ -176,7 +176,7 @@ export default function DashboardPage() {
             <div className="stat-label">Fechamentos (mês)</div>
           </div>
           <div className="stat-icon">
-            <CheckCircle size={20} className="text-[var(--green)]" />
+            <CheckCircle size={26} className="text-[var(--green)]" />
           </div>
         </div>
 
@@ -186,7 +186,7 @@ export default function DashboardPage() {
             <div className="stat-label">Em Negociação</div>
           </div>
           <div className="stat-icon">
-            <TrendingUp size={20} className="text-[var(--yellow)]" />
+            <TrendingUp size={26} className="text-[var(--yellow)]" />
           </div>
         </div>
 
@@ -196,7 +196,7 @@ export default function DashboardPage() {
             <div className="stat-label">Perdidos (mês)</div>
           </div>
           <div className="stat-icon">
-            <XCircle size={20} className="text-[var(--red)]" />
+            <XCircle size={26} className="text-[var(--red)]" />
           </div>
         </div>
       </div>

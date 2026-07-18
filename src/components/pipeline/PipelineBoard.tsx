@@ -116,7 +116,9 @@ function KanbanColumn({ stage, deals }: { stage: DealStage; deals: Deal[] }) {
   return (
     <div className="kanban-col" style={style}>
       <div className="kanban-col-header">
-        <span className="kanban-col-icon">{cfg.icon}</span>
+        <span className="kanban-col-icon">
+          <cfg.icon size={14} />
+        </span>
         <div className="kanban-col-info">
           <div className="kanban-col-title">
             {cfg.label}
