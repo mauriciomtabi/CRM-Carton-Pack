@@ -6,7 +6,7 @@
    ══════════════════════════════════════════ */
 
 :root {
-  --font-roboto: var(--font-roboto, 'Roboto', sans-serif);
+  --font-brand: var(--font-roboto, 'Roboto', sans-serif);
   /* ── Cores exatas da proposta ── */
   --black:     #060606;
   --charcoal:  #121212;
@@ -61,7 +61,7 @@
 
 html, body {
   height: 100%;
-  font-family: var(--font-roboto), -apple-system, sans-serif;
+  font-family: var(--font-brand), -apple-system, sans-serif;
   background: var(--black);
   color: var(--white);
   -webkit-font-smoothing: antialiased;
@@ -84,8 +84,8 @@ html, body {
 }
 
 /* ══════════════ TYPOGRAPHY ══════════════ */
-.font-display { font-family: var(--font-roboto), sans-serif; font-weight: 700; letter-spacing: -0.01em; }
-.font-mono    { font-family: var(--font-roboto), sans-serif; }
+.font-display { font-family: var(--font-brand), sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+.font-mono    { font-family: var(--font-brand), sans-serif; }
 
 /* ══════════════ TRANSITIONS ══════════════ */
 a, button, input, select, textarea {
@@ -151,7 +151,7 @@ a, button, input, select, textarea {
 }
 
 .sidebar-logo-name {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-weight: 900;
   font-size: 14px;
   letter-spacing: 0.02em;
@@ -162,7 +162,7 @@ a, button, input, select, textarea {
 .sidebar-logo-name .pack   { color: var(--lime); }
 
 .sidebar-logo-sub {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 9px;
   color: var(--gray2);
   text-transform: uppercase;
@@ -174,7 +174,7 @@ a, button, input, select, textarea {
 .sidebar-section { padding: 8px 0; }
 
 .sidebar-section-label {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -230,7 +230,7 @@ a, button, input, select, textarea {
   margin-left: auto;
   background: var(--lime);
   color: var(--black);
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 9px;
   font-weight: 800;
   padding: 2px 7px;
@@ -269,7 +269,7 @@ a, button, input, select, textarea {
 }
 
 .topbar-title {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-weight: 700;
   font-size: 17px;
   letter-spacing: -0.01em;
@@ -318,7 +318,7 @@ a, button, input, select, textarea {
   gap: 6px;
   padding: 8px 16px;
   border-radius: 8px;
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
@@ -444,14 +444,14 @@ a, button, input, select, textarea {
 }
 
 .kanban-col-value {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 10px;
   color: var(--green);
   margin-top: 1px;
 }
 
 .kanban-col-count {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 11px;
   font-weight: 700;
   padding: 2px 8px;
@@ -478,7 +478,7 @@ a, button, input, select, textarea {
   text-align: center;
   font-size: 12px;
   color: var(--gray2);
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
 }
 
 .kanban-add-btn {
@@ -495,7 +495,7 @@ a, button, input, select, textarea {
   justify-content: center;
   gap: 5px;
   width: calc(100% - 12px);
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -597,7 +597,7 @@ a, button, input, select, textarea {
 }
 
 .deal-value {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 12px;
   font-weight: 700;
   color: var(--lime);
@@ -607,7 +607,7 @@ a, button, input, select, textarea {
   display: flex;
   align-items: center;
   gap: 3px;
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 10px;
   font-weight: 700;
   padding: 2px 8px;
@@ -628,7 +628,7 @@ a, button, input, select, textarea {
   font-weight: 800;
   color: var(--black);
   flex-shrink: 0;
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
 }
 
 /* ══════════════ CARD ══════════════ */
@@ -670,7 +670,7 @@ a, button, input, select, textarea {
 }
 
 .stat-value {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-weight: 700;
   font-size: 30px;
   line-height: 1.1;
@@ -678,7 +678,7 @@ a, button, input, select, textarea {
 }
 
 .stat-label {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 11px;
   font-weight: 500;
   color: var(--gray);
@@ -719,7 +719,7 @@ a, button, input, select, textarea {
 
 .label {
   display: block;
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 10px;
   font-weight: 700;
   color: var(--gray);
@@ -774,7 +774,7 @@ textarea.input { resize: vertical; min-height: 80px; }
 .module-tile:hover::before { transform: scaleX(1); }
 
 .module-tag {
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 10px;
   color: var(--lime);
   margin-bottom: 12px;
@@ -787,7 +787,7 @@ textarea.input { resize: vertical; min-height: 80px; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 10.5px;
   color: var(--lime);
   background: rgba(180,217,50,0.10);
@@ -820,7 +820,7 @@ textarea.input { resize: vertical; min-height: 80px; }
   text-align: center;
   color: var(--gray2);
   gap: 10px;
-  font-family: var(--font-roboto), sans-serif;
+  font-family: var(--font-brand), sans-serif;
   font-size: 12px;
 }
 
