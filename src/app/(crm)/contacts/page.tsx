@@ -502,18 +502,60 @@ function ContactDrawer({
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="label">Endereço Completo</label>
-                    <div className="relative">
-                      <MapPin size={14} className="absolute text-gray-500" />
-                      <input 
-                        type="text" 
-                        className="input text-xs" 
-                        value={address} 
-                        onChange={(e) => setAddress(e.target.value)}
-                        onBlur={handleSaveGeneral}
-                      />
+                      <div className="flex items-center justify-between">
+                        <label className="label">Endereço Completo</label>
+                        {(address || city) && (
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={`https://www.openstreetmap.org/search?query=${encodeURIComponent([address, city, state].filter(Boolean).join(', '))}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Ver localização no OpenStreetMap"
+                              className="flex items-center gap-1 text-[9px] font-bold text-sky-400 hover:text-sky-200 uppercase tracking-wider font-mono transition-colors"
+                            >
+                              <MapPin size={9} />
+                              <span>Mapa</span>
+                              <ExternalLink size={8} />
+                            </a>
+                            <span className="text-[var(--line)] text-xs">|</span>
+                            <a
+                              href={`https://www.google.com/maps?q=${encodeURIComponent([address, city, state].filter(Boolean).join(', '))}&layer=c`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Ver fachada no Google Street View"
+                              className="flex items-center gap-1 text-[9px] font-bold text-amber-400 hover:text-amber-200 uppercase tracking-wider font-mono transition-colors"
+                            >
+                              <span>Street View</span>
+                              <ExternalLink size={8} />
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <MapPin size={14} className="absolute text-gray-500" />
+                        <input 
+                          type="text" 
+                          className="input text-xs" 
+                          value={address} 
+                          onChange={(e) => setAddress(e.target.value)}
+                          onBlur={handleSaveGeneral}
+                        />
+                      </div>
+                      {/* Inline OpenStreetMap embed */}
+                      {(address || city) && (
+                        <div className="mt-1 rounded-lg overflow-hidden border border-[var(--line)]" style={{ height: 160 }}>
+                          <iframe
+                            title="Localização no mapa"
+                            src={`https://www.openstreetmap.org/export/embed.html?bbox=-180,-90,180,90&layer=mapnik&marker=0,0&mlat=&mlon=&zoom=15&query=${encodeURIComponent([address, city, state].filter(Boolean).join(', '))}`}
+                            width="100%"
+                            height="160"
+                            style={{ border: 0, filter: 'invert(0.9) hue-rotate(180deg) brightness(0.85)' }}
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                          />
+                        </div>
+                      )}
                     </div>
-                  </div>
 
                   <div className="grid grid-cols-3 gap-4">
                     <div className="col-span-2 flex flex-col gap-1.5">
@@ -754,7 +796,13 @@ function NewContactModal({
       }
       
       setStateRegistration(ieVal || '')
-      setName('') // Stay blank for manual physical person responsible name entry
+
+      // Pull responsible person from company.members: prefer admin/director roles first, fall back to first member
+      const adminRoles = ['Sócio-Administrador', 'Administrador', 'Diretor', 'Presidente', 'Gerente']
+      const members = data.company?.members || []
+      const adminMember = members.find((m: any) => adminRoles.some(r => m.role?.text?.includes(r)))
+      const responsibleMember = adminMember || members[0]
+      setName(responsibleMember?.person?.name || '')
     } catch (err) {
       setCnpjError('Erro ao buscar CNPJ. CNPJ inexistente ou API fora do ar.')
     } finally {
