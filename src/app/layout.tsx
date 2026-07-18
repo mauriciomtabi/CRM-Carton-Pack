@@ -1,5 +1,13 @@
 import type { Metadata } from 'next'
+import { Roboto } from 'next/font/google'
 import './globals.css'
+
+const roboto = Roboto({
+  weight: ['300', '400', '500', '700', '900'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto',
+})
 
 export const metadata: Metadata = {
   title: 'Carton Pack CRM',
@@ -8,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className={roboto.variable}>
       <body>{children}</body>
     </html>
   )

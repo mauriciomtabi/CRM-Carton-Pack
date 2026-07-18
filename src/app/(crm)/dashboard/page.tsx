@@ -103,7 +103,7 @@ export default function DashboardPage() {
         <h1 className="font-display text-3xl text-[var(--white)] tracking-tight">
           Dashboard
         </h1>
-        <p className="font-mono text-xs text-[var(--gray)] mt-1 uppercase tracking-wider">
+        <p className="text-xs text-[var(--gray)] mt-1 uppercase tracking-wider font-medium">
           Visão geral do pipeline comercial — Carton Pack
         </p>
       </div>

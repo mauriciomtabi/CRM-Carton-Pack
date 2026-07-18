@@ -69,7 +69,7 @@ export default function ContactsPage() {
           <h1 className="font-display text-3xl text-[var(--white)] tracking-tight">
             Carteira de Clientes
           </h1>
-          <p className="font-mono text-xs text-[var(--gray)] mt-1 uppercase tracking-wider">
+          <p className="text-xs text-[var(--gray)] mt-1 uppercase tracking-wider font-medium">
             Gestão comercial e classificação de clientes ativos/inativos
           </p>
         </div>
