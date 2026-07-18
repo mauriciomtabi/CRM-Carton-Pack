@@ -982,26 +982,48 @@ function NewContactModal({
                   />
                 </div>
 
-                {/* Map icon — bare lime icon, no border/bg */}
-                <a
-                  href={(address || city) ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([address, bairro, city, state, cep].filter(Boolean).join(', '))}` : '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Ver endereço no mapa"
-                  className={`self-end mb-[7px] flex-shrink-0 transition-colors ${(address || city) ? 'text-[var(--lime)] hover:opacity-70 cursor-pointer' : 'text-[var(--gray2)] opacity-30 pointer-events-none'}`}
-                >
-                  <MapPin size={18} />
-                </a>
+                {/* Map icon — same height structure as other fields */}
+                <div className="flex flex-col gap-1 flex-shrink-0">
+                  <label className="text-[9px] font-bold text-transparent uppercase font-mono tracking-wider select-none">·</label>
+                  <a
+                    href={(address || city) ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([address, bairro, city, state, cep].filter(Boolean).join(', '))}` : '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Ver endereço no mapa"
+                    className={`flex items-center justify-center py-1.5 px-1 transition-colors ${(address || city) ? 'text-[var(--lime)] hover:opacity-70 cursor-pointer' : 'text-[var(--gray2)] opacity-30 pointer-events-none'}`}
+                  >
+                    <MapPin size={20} />
+                  </a>
+                </div>
               </div>
             </div>
 
           </div>
 
-          {/* RIGHT COLUMN (1/3 width): Inscrições first (aligns with Dados Cadastrais), Regime Tributário second */}
+          {/* RIGHT COLUMN — Regime Tributário (top) + Inscrições flex-1 (bottom aligns with Dados Cadastrais) */}
           <div className="flex flex-col gap-4">
 
-            {/* Card 3: Inscrições Estaduais e Status */}
+            {/* Card 3: Regime Tributário */}
             <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
+              <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Regime Tributário</h4>
+              
+              <div className="flex flex-col gap-1">
+                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Regime Tributário</label>
+                <select 
+                  className="input text-xs py-1.5" 
+                  value={taxRegime} 
+                  onChange={(e) => setTaxRegime(e.target.value as any)}
+                >
+                  <option value="MEI">MEI</option>
+                  <option value="Simples Nacional">Simples Nacional</option>
+                  <option value="Lucro Presumido">Lucro Presumido</option>
+                  <option value="Lucro Real">Lucro Real</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Card 4: Inscrições Estaduais e Status — flex-1 to fill remaining height */}
+            <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3 flex-1">
               <div className="flex justify-between items-center border-b border-[var(--line)] pb-1">
                 <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] font-mono">Inscrições Estaduais e Status</h4>
                 {cnpj && (
@@ -1062,25 +1084,6 @@ function NewContactModal({
                     onChange={(e) => setSpecialSituationDate(e.target.value)}
                   />
                 </div>
-              </div>
-            </div>
-
-            {/* Card 4: Regime Tributário */}
-            <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
-              <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Regime Tributário</h4>
-              
-              <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Regime Tributário</label>
-                <select 
-                  className="input text-xs py-1.5" 
-                  value={taxRegime} 
-                  onChange={(e) => setTaxRegime(e.target.value as any)}
-                >
-                  <option value="MEI">MEI</option>
-                  <option value="Simples Nacional">Simples Nacional</option>
-                  <option value="Lucro Presumido">Lucro Presumido</option>
-                  <option value="Lucro Real">Lucro Real</option>
-                </select>
               </div>
             </div>
 
