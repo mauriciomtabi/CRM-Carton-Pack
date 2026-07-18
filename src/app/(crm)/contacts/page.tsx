@@ -19,11 +19,12 @@ import {
   ShieldCheck,
   Percent,
   FileSpreadsheet,
-  ExternalLink
+  ExternalLink,
+  Clock
 } from 'lucide-react'
 import { whatsappLink, formatCurrency } from '@/lib/utils'
 
-interface MockContact {
+export interface MockContact {
   id: string
   name: string
   company: string
@@ -34,7 +35,7 @@ interface MockContact {
   phone: string
   city: string
   state: string
-  status: 'ativo' | 'inativo'
+  status: 'ativo' | 'inativo' | 'prospeccao'
   email?: string
   // Expanded fields
   tradeName?: string
@@ -47,6 +48,7 @@ interface MockContact {
   specialSituation?: string
   specialSituationDate?: string
   stateRegistration?: string // Inscrição Estadual
+  sideActivities?: {id: string; text: string}[]
 }
 
 interface Activity {
@@ -140,7 +142,11 @@ function ContactDrawer({
   const [email, setEmail] = useState('')
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
-  const [status, setStatus] = useState<'ativo' | 'inativo'>('ativo')
+  const [status, setStatus] = useState<'ativo' | 'inativo' | 'prospeccao'>('ativo')
+  const [bairro, setBairro] = useState('')
+  const [cep, setCep] = useState('')
+  const [sideActivities, setSideActivities] = useState<{id: string; text: string}[]>([])
+  const [showSideActivities, setShowSideActivities] = useState(false)
   
   // Expanded fields
   const [registrationStatus, setRegistrationStatus] = useState('')
@@ -170,6 +176,10 @@ function ContactDrawer({
       setCity(contact.city)
       setState(contact.state)
       setStatus(contact.status)
+      setBairro(contact.bairro ?? '')
+      setCep(contact.cep ?? '')
+      setSideActivities(contact.sideActivities ?? [])
+      setShowSideActivities(false)
       setRegistrationStatus(contact.registrationStatus ?? 'ATIVA')
       setMainCnae(contact.mainCnae ?? '')
       setAddress(contact.address ?? '')
@@ -213,6 +223,9 @@ function ContactDrawer({
       specialSituation,
       specialSituationDate,
       stateRegistration,
+      bairro,
+      cep,
+      sideActivities,
       ...cleanOverrides
     })
   }
@@ -254,7 +267,7 @@ function ContactDrawer({
       )}
 
       {/* Drawer Body */}
-      <div className={`drawer-sheet ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`drawer-sheet ${isOpen ? 'translate-x-0' : 'translate-x-full'}`} style={{ width: '960px', maxWidth: '95vw' }}>
         {/* Header */}
         <div className="p-6 border-b border-[var(--line)] flex justify-between items-start bg-[var(--card)]">
           <div>
@@ -337,7 +350,13 @@ function ContactDrawer({
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Status Carteira</label>
                   <select 
                     className="input text-xs py-1 px-2 font-bold bg-[var(--charcoal)]"
-                    style={{ color: status === 'ativo' ? 'var(--green)' : 'var(--red)' }}
+                    style={{ 
+                      color: status === 'ativo' 
+                        ? 'var(--green)' 
+                        : status === 'inativo' 
+                          ? 'var(--red)' 
+                          : 'var(--yellow)' 
+                    }}
                     value={status} 
                     onChange={(e) => {
                       const val = e.target.value as any
@@ -347,251 +366,305 @@ function ContactDrawer({
                   >
                     <option value="ativo">Ativo</option>
                     <option value="inativo">Inativo</option>
+                    <option value="prospeccao">Em Prospecção</option>
                   </select>
                 </div>
               </div>
               
-              {/* Seção: Identificação */}
-              <div>
-                <h3 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3 border-b border-[var(--line)] pb-1">Identificação</h3>
-                <div className="flex flex-col gap-4">
-                  <div className="grid grid-cols-2 gap-4">
+              {/* Dashboard 2-Column Split Layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                
+                {/* LEFT COLUMN (2/3 width): Dados Cadastrais */}
+                <div className="lg:col-span-2 flex flex-col gap-4">
+                  <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3 flex-1">
+                    <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Dados Cadastrais</h4>
+                    
                     <div className="flex flex-col gap-1.5">
-                      <label className="label">Razão Social / Empresa</label>
-                      <div className="relative">
-                        <Building2 size={14} className="absolute text-gray-500" />
-                        <input 
-                          type="text" 
-                          className="input" 
-                          value={company} 
-                          onChange={(e) => setCompany(e.target.value)}
-                          onBlur={handleSaveGeneral}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">Nome Fantasia</label>
+                      <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Razão Social / Empresa</label>
                       <input 
                         type="text" 
-                        className="input" 
-                        value={tradeName} 
-                        onChange={(e) => setTradeName(e.target.value)}
-                        onBlur={handleSaveGeneral}
+                        className="bg-transparent border-b border-dashed border-[var(--line)] focus:border-[var(--lime)] font-display text-sm text-[var(--white)] font-bold w-full pb-1 focus:outline-none"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        onBlur={() => handleSaveGeneral()}
                       />
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">Nome do Responsável</label>
-                      <div className="relative">
-                        <User size={14} className="absolute text-gray-500" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Nome Fantasia</label>
                         <input 
                           type="text" 
-                          className="input" 
-                          value={name} 
+                          className="input text-xs py-1.5" 
+                          value={tradeName}
+                          onChange={(e) => setTradeName(e.target.value)}
+                          onBlur={() => handleSaveGeneral()}
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Responsável (Pessoa Física)</label>
+                        <input 
+                          type="text" 
+                          className="input text-xs py-1.5" 
+                          value={name}
                           onChange={(e) => setName(e.target.value)}
-                          onBlur={handleSaveGeneral}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">CNPJ</label>
-                      <input 
-                        type="text" 
-                        className="input font-mono" 
-                        value={cnpj} 
-                        onChange={(e) => setCnpj(formatCnpj(e.target.value))}
-                        onBlur={handleSaveGeneral}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Seção: Dados Fiscais */}
-              <div>
-                <h3 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3 border-b border-[var(--line)] pb-1">Informações Fiscais</h3>
-                <div className="flex flex-col gap-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">Situação Cadastral</label>
-                      <div className="relative">
-                        <ShieldCheck size={14} className="absolute text-gray-500" />
-                        <input 
-                          type="text" 
-                          className="input font-bold" 
-                          style={{ color: registrationStatus.includes('ATIVA') ? 'var(--green)' : 'var(--white)' }}
-                          value={registrationStatus} 
-                          onChange={(e) => setRegistrationStatus(e.target.value)}
                           onBlur={() => handleSaveGeneral()}
                         />
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">Regime Tributário</label>
-                      <div className="relative">
-                        <Percent size={14} className="absolute text-gray-500" />
-                        <select 
-                          className="input" 
-                          value={taxRegime} 
-                          onChange={(e) => {
-                            setTaxRegime(e.target.value as any)
-                            handleSaveGeneral({ taxRegime: e.target.value as any })
-                          }}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CNPJ</label>
+                        <input 
+                          type="text" 
+                          className="input text-xs py-1.5 font-mono" 
+                          value={cnpj}
+                          onChange={(e) => setCnpj(formatCnpj(e.target.value))}
+                          onBlur={() => handleSaveGeneral()}
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Telefone</label>
+                        <input 
+                          type="text" 
+                          className="input text-xs py-1.5" 
+                          value={phone}
+                          onChange={(e) => setPhone(formatPhoneBr(e.target.value))}
+                          onBlur={() => handleSaveGeneral()}
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">E-mail</label>
+                        <input 
+                          type="email" 
+                          className="input text-xs py-1.5" 
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          onBlur={() => handleSaveGeneral()}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Linha 1 Endereço: Rua + Bairro */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="col-span-2 flex flex-col gap-1.5">
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Rua / Número</label>
+                        <input 
+                          type="text" 
+                          className="input text-xs py-1.5" 
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          onBlur={() => handleSaveGeneral()}
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Bairro</label>
+                        <input 
+                          type="text" 
+                          className="input text-xs py-1.5" 
+                          value={bairro}
+                          onChange={(e) => setBairro(e.target.value)}
+                          onBlur={() => handleSaveGeneral()}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Linha 2 Endereço: CEP + Cidade + UF + Map Pin */}
+                    <div className="flex gap-3">
+                      <div className="flex flex-col gap-1.5" style={{ width: '110px', flexShrink: 0 }}>
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CEP</label>
+                        <input 
+                          type="text" 
+                          maxLength={9}
+                          className="input text-xs py-1.5 font-mono" 
+                          value={cep}
+                          onChange={(e) => setCep(e.target.value)}
+                          onBlur={() => handleSaveGeneral()}
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5 flex-1">
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Cidade</label>
+                        <input 
+                          type="text" 
+                          className="input text-xs py-1.5" 
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                          onBlur={() => handleSaveGeneral()}
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1.5" style={{ width: '88px', flexShrink: 0 }}>
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">UF</label>
+                        <input 
+                          type="text" 
+                          maxLength={2}
+                          className="input text-xs py-1.5 uppercase text-center font-bold font-mono w-full" 
+                          value={state}
+                          onChange={(e) => setState(e.target.value.toUpperCase())}
+                          onBlur={() => handleSaveGeneral()}
+                        />
+                      </div>
+
+                      {/* Map icon */}
+                      <div className="flex flex-col gap-1.5" style={{ flexShrink: 0 }}>
+                        <label className="text-[9px] font-bold text-transparent uppercase font-mono tracking-wider select-none">·</label>
+                        <a
+                          href={(address || city) ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([address, bairro, city, state, cep].filter(Boolean).join(', '))}` : '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Ver endereço no mapa"
+                          className={`flex items-center justify-center py-1.5 px-1 transition-colors ${(address || city) ? 'text-[var(--lime)] hover:opacity-70 cursor-pointer' : 'text-[var(--gray2)] opacity-30 pointer-events-none'}`}
                         >
-                          <option value="MEI">MEI</option>
-                          <option value="Simples Nacional">Simples Nacional</option>
-                          <option value="Lucro Presumido">Lucro Presumido</option>
-                          <option value="Lucro Real">Lucro Real</option>
-                        </select>
+                          <MapPin size={20} />
+                        </a>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                {/* RIGHT COLUMN (1/3 width): Fisco e Tributário */}
+                <div className="flex flex-col gap-4">
+                  {/* Card 2: Regime Tributário */}
+                  <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
+                    <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Regime Tributário</h4>
                     <div className="flex flex-col gap-1.5">
-                      <div className="flex items-center justify-between">
-                        <label className="label">Inscrição Estadual</label>
-                        {cnpj && (
-                          <a
-                            href={`https://cnpja.com/office/${cnpj.replace(/\D/g, '')}?tab=registrations`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Consultar Inscrições Estaduais no CNPJá"
-                            className="text-[var(--lime)] hover:text-white transition-colors"
-                          >
-                            <ExternalLink size={11} />
-                          </a>
-                        )}
-                      </div>
+                      <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Regime Tributário</label>
+                      <select 
+                        className="input text-xs py-1.5" 
+                        value={taxRegime} 
+                        onChange={(e) => {
+                          const val = e.target.value as any
+                          setTaxRegime(val)
+                          handleSaveGeneral({ taxRegime: val })
+                        }}
+                      >
+                        <option value="MEI">MEI</option>
+                        <option value="Simples Nacional">Simples Nacional</option>
+                        <option value="Lucro Presumido">Lucro Presumido</option>
+                        <option value="Lucro Real">Lucro Real</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Card 3: Inscrições Estaduais e Status */}
+                  <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3 flex-1">
+                    <div className="flex justify-between items-center border-b border-[var(--line)] pb-1">
+                      <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] font-mono">Inscrições Estaduais e Status</h4>
+                      {cnpj && (
+                        <a 
+                          href={`https://cnpja.com/office/${cnpj.replace(/\D/g, '')}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-[9px] font-bold text-[var(--lime)] hover:text-white uppercase tracking-wider font-mono flex items-center gap-1 transition-colors"
+                        >
+                          <span>Ver no CNPJá</span>
+                          <ExternalLink size={10} />
+                        </a>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Situação Cadastral</label>
                       <input 
                         type="text" 
-                        className="input font-mono" 
-                        placeholder="Insira a IE manualmente"
-                        value={stateRegistration} 
+                        className="input text-xs py-1.5 font-bold" 
+                        style={{ color: registrationStatus.includes('ATIVA') ? 'var(--green)' : 'var(--white)' }}
+                        value={registrationStatus}
+                        onChange={(e) => setRegistrationStatus(e.target.value)}
+                        onBlur={() => handleSaveGeneral()}
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Inscrição Estadual (IE)</label>
+                      <input 
+                        type="text" 
+                        className="input text-xs py-1.5 font-mono" 
+                        value={stateRegistration}
                         onChange={(e) => setStateRegistration(e.target.value)}
                         onBlur={() => handleSaveGeneral()}
                       />
                     </div>
 
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">CNAE Principal</label>
-                      <div className="relative">
-                        <FileSpreadsheet size={14} className="absolute text-gray-500" />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Situação Especial</label>
                         <input 
                           type="text" 
-                          className="input" 
-                          value={mainCnae} 
-                          onChange={(e) => setMainCnae(e.target.value)}
+                          className="input text-xs py-1.5" 
+                          value={specialSituation}
+                          onChange={(e) => setSpecialSituation(e.target.value)}
+                          onBlur={() => handleSaveGeneral()}
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Data Situação</label>
+                        <input 
+                          type="text" 
+                          className="input text-xs py-1.5" 
+                          value={specialSituationDate}
+                          onChange={(e) => setSpecialSituationDate(e.target.value)}
                           onBlur={() => handleSaveGeneral()}
                         />
                       </div>
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">Situação Especial</label>
-                      <input 
-                        type="text" 
-                        className="input" 
-                        value={specialSituation} 
-                        onChange={(e) => setSpecialSituation(e.target.value)}
-                        onBlur={() => handleSaveGeneral()}
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">Data Situação Especial</label>
-                      <input 
-                        type="text" 
-                        className="input" 
-                        value={specialSituationDate} 
-                        onChange={(e) => setSpecialSituationDate(e.target.value)}
-                        onBlur={() => handleSaveGeneral()}
-                      />
-                    </div>
-                  </div>
                 </div>
+
               </div>
 
-              {/* Seção: Endereço e Contato */}
-              <div>
-                <h3 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3 border-b border-[var(--line)] pb-1">Endereço e Contato</h3>
-                <div className="flex flex-col gap-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">Telefone (WhatsApp)</label>
-                      <div className="relative">
-                        <Phone size={14} className="absolute text-gray-500" />
-                        <input 
-                          type="text" 
-                          className="input" 
-                          value={phone} 
-                          onChange={(e) => setPhone(formatPhoneBr(e.target.value))}
-                          onBlur={handleSaveGeneral}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">E-mail</label>
-                      <div className="relative">
-                        <Mail size={14} className="absolute text-gray-500" />
-                        <input 
-                          type="email" 
-                          className="input" 
-                          value={email} 
-                          onChange={(e) => setEmail(e.target.value)}
-                          onBlur={handleSaveGeneral}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="label">Endereço Completo</label>
-                    <div className="relative">
-                      <MapPin size={14} className="absolute text-gray-500" />
-                      <input 
-                        type="text" 
-                        className="input text-xs" 
-                        value={address} 
-                        onChange={(e) => setAddress(e.target.value)}
-                        onBlur={handleSaveGeneral}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="col-span-2 flex flex-col gap-1.5">
-                      <label className="label">Cidade</label>
-                      <input 
-                        type="text" 
-                        className="input" 
-                        value={city} 
-                        onChange={(e) => setCity(e.target.value)}
-                        onBlur={() => handleSaveGeneral()}
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">UF</label>
-                      <input 
-                        type="text" 
-                        maxLength={2}
-                        className="input uppercase text-center font-bold font-mono" 
-                        value={state} 
-                        onChange={(e) => setState(e.target.value.toUpperCase())}
-                        onBlur={() => handleSaveGeneral()}
-                      />
-                    </div>
-                  </div>
+              {/* Card 4: Atividades Econômicas */}
+              <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
+                <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Atividades Econômicas</h4>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CNAE Principal</label>
+                  <input 
+                    type="text" 
+                    className="input text-xs py-1.5" 
+                    value={mainCnae}
+                    onChange={(e) => setMainCnae(e.target.value)}
+                    onBlur={() => handleSaveGeneral()}
+                  />
                 </div>
+
+                {sideActivities.length > 0 && (
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowSideActivities(v => !v)}
+                      className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider font-mono transition-colors w-fit"
+                      style={{ color: showSideActivities ? 'var(--lime)' : 'var(--gray)' }}
+                    >
+                      <span
+                        className="inline-block transition-transform duration-200"
+                        style={{ transform: showSideActivities ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                      >▶</span>
+                      {showSideActivities ? 'Ocultar' : 'Ver'} atividades secundárias ({sideActivities.length})
+                    </button>
+
+                    {showSideActivities && (
+                      <div className="flex flex-col gap-0 border border-[var(--line)] rounded-lg overflow-hidden">
+                        {sideActivities.map((act, i) => (
+                          <div
+                            key={act.id}
+                            className="flex gap-2 px-3 py-1.5 text-xs font-mono"
+                            style={{ background: i % 2 === 0 ? 'var(--card2)' : 'transparent' }}
+                          >
+                            <span className="text-[var(--lime)] font-bold shrink-0">{act.id}</span>
+                            <span className="text-[var(--gray)]">{act.text}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
             </div>
@@ -1207,9 +1280,7 @@ export default function ContactsPage() {
     
     const matchesCurve = selectedCurve === 'all' || contact.curve === selectedCurve
     const matchesRep = selectedRep === 'all' || contact.representative === selectedRep
-    const matchesStatus = selectedStatus === 'all' || 
-      (selectedStatus === 'inativo' && contact.lastPurchaseDays > 90) ||
-      (selectedStatus === 'ativo' && contact.lastPurchaseDays <= 90)
+    const matchesStatus = selectedStatus === 'all' || contact.status === selectedStatus
 
     return matchesSearch && matchesCurve && matchesRep && matchesStatus
   })
@@ -1323,8 +1394,9 @@ export default function ContactsPage() {
             onChange={(e) => setSelectedStatus(e.target.value)}
           >
             <option value="all">Todos os Status</option>
-            <option value="ativo">Clientes Ativos (&lt; 90 dias sem compra)</option>
-            <option value="inativo">Inativos / Alerta (&gt; 90 dias sem compra)</option>
+            <option value="ativo">Clientes Ativos</option>
+            <option value="inativo">Inativos / Alerta</option>
+            <option value="prospeccao">Em Prospecção</option>
           </select>
         </div>
       </div>
@@ -1346,7 +1418,6 @@ export default function ContactsPage() {
             </thead>
             <tbody className="divide-y divide-[var(--line)]">
               {filteredContacts.map(contact => {
-                const isInactive = contact.lastPurchaseDays > 90
                 return (
                   <tr 
                     key={contact.id} 
@@ -1362,9 +1433,14 @@ export default function ContactsPage() {
                         <div>
                           <div className="text-sm font-bold text-[var(--white)] flex items-center gap-2">
                             {contact.company}
-                            {isInactive && (
+                            {contact.status === 'inativo' && (
                               <span className="font-mono text-[9px] bg-[rgba(226,72,61,0.15)] text-[var(--red)] px-2 py-0.5 rounded-full border border-[rgba(226,72,61,0.25)] flex items-center gap-1">
                                 <AlertCircle size={8} /> ALERTA INATIVO
+                              </span>
+                            )}
+                            {contact.status === 'prospeccao' && (
+                              <span className="font-mono text-[9px] bg-[rgba(240,196,25,0.15)] text-[var(--yellow)] px-2 py-0.5 rounded-full border border-[rgba(240,196,25,0.25)] flex items-center gap-1">
+                                <Clock size={8} /> EM PROSPECÇÃO
                               </span>
                             )}
                           </div>
