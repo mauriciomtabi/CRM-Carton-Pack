@@ -83,11 +83,6 @@ export function Sidebar() {
                   <Icon size={18} strokeWidth={active ? 2.5 : 2} />
                 </div>
                 <span>{label}</span>
-                {href === '/pipeline' && (
-                  <span className="nav-badge">
-                    LIVE
-                  </span>
-                )}
               </Link>
             )
           })}
