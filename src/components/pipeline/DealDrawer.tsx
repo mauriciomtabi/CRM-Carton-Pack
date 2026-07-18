@@ -73,6 +73,14 @@ export function DealDrawer({ deal, onClose, onUpdateDeal }: DealDrawerProps) {
     }
   }, [deal])
 
+  // Hide Budget tab if stage is downgraded
+  useEffect(() => {
+    const showBudget = ['briefing', 'aprovacao', 'fechamento', 'perdido', 'pos_venda'].includes(stage)
+    if (!showBudget && activeTab === 'orcamento') {
+      setActiveTab('geral')
+    }
+  }, [stage, activeTab])
+
   if (!deal) return null
 
   // Calculate pricing based on briefing dimensions
@@ -222,12 +230,14 @@ export function DealDrawer({ deal, onClose, onUpdateDeal }: DealDrawerProps) {
           >
             Histórico
           </button>
-          <button 
-            className={`drawer-tab-btn ${activeTab === 'orcamento' ? 'active' : ''}`}
-            onClick={() => setActiveTab('orcamento')}
-          >
-            Orçamento
-          </button>
+          {['briefing', 'aprovacao', 'fechamento', 'perdido', 'pos_venda'].includes(stage) && (
+            <button 
+              className={`drawer-tab-btn ${activeTab === 'orcamento' ? 'active' : ''}`}
+              onClick={() => setActiveTab('orcamento')}
+            >
+              Orçamento
+            </button>
+          )}
         </div>
 
         {/* Drawer Scrollable Content */}

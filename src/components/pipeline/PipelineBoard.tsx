@@ -18,21 +18,21 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useDroppable } from '@dnd-kit/core'
-import { Deal, DealStage, STAGE_CONFIG } from '@/types'
-import { formatCurrency, daysSince, getInitials } from '@/lib/utils'
-import { Plus, Clock } from 'lucide-react'
+import { Deal, DealStage, STAGE_CONFIG, FOLLOW_UP_LOST_REASONS } from '@/types'
+import { formatCurrency, daysSince } from '@/lib/utils'
+import { Plus, Clock, Trophy, XCircle, Search, Filter } from 'lucide-react'
 import { DealDrawer } from './DealDrawer'
 
 // ─── Mock data ────────────────────────────────────────────────
 const MOCK_DEALS: Deal[] = [
-  { id: '1', title: 'Caixa Premium Natura',   contact_id: 'c1', stage: 'leads',      position: 0, estimated_value: undefined, stage_entered_at: new Date(Date.now()-2*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c1', name:'Ana Lima',      company:'Natura',        created_at:'', updated_at:'' } },
-  { id: '2', title: 'Embalagem XP Presentes', contact_id: 'c2', stage: 'prospect',   position: 0, estimated_value: undefined, stage_entered_at: new Date(Date.now()-5*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c2', name:'Carlos Mendes', company:'XP Presentes',  created_at:'', updated_at:'' } },
-  { id: '3', title: 'Display Farmácia São J.', contact_id: 'c3', stage: 'prospect',  position: 1, estimated_value: undefined, stage_entered_at: new Date(Date.now()-10*86400000).toISOString(),created_at: '', updated_at: '', contact: { id:'c3', name:'Juliana Paz',   company:'Farmácia São J',created_at:'', updated_at:'' } },
-  { id: '4', title: 'Kit Cosméticos Avon',    contact_id: 'c4', stage: 'dinamica',   position: 0, estimated_value: undefined, stage_entered_at: new Date(Date.now()-3*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c4', name:'Roberto Alves', company:'Avon',          created_at:'', updated_at:'' } },
-  { id: '5', title: 'Caixa Vinho Gourmet',    contact_id: 'c5', stage: 'potencial',  position: 0, estimated_value: undefined, stage_entered_at: new Date(Date.now()-7*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c5', name:'Marina Costa',  company:'Vinhos do Sul', created_at:'', updated_at:'' } },
-  { id: '6', title: 'Bandeja Padaria Central',contact_id: 'c6', stage: 'visita',     position: 0, estimated_value: undefined, stage_entered_at: new Date(Date.now()-1*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c6', name:'Paulo Lima',    company:'Padaria Central',created_at:'',updated_at:'' } },
-  { id: '7', title: 'Embalagem Cosméticos M.',contact_id: 'c7', stage: 'briefing',   position: 0, estimated_value: 32000,     stage_entered_at: new Date(Date.now()-4*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c7', name:'Fernanda R.',   company:'Cosmética M.',  created_at:'', updated_at:'' } },
-  { id: '8', title: 'Caixa Presente Boticário',contact_id:'c8', stage: 'aprovacao',  position: 0, estimated_value: 48000,     stage_entered_at: new Date(Date.now()-2*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c8', name:'Gustavo N.',    company:'O Boticário',   created_at:'', updated_at:'' } },
+  { id: '1', title: 'Caixa Premium Natura',    contact_id:'c1', stage: 'leads',      position: 0, estimated_value: 40000, stage_entered_at: new Date(Date.now()-2*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c1', name:'Ana Lima', company:'Natura',      created_at:'', updated_at:'' } },
+  { id: '2', title: 'Embalagem XP Presentes',   contact_id:'c2', stage: 'prospect',   position: 0, estimated_value: 12000, stage_entered_at: new Date(Date.now()-5*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c2', name:'Carlos Mendes', company:'XP Presentes', created_at:'', updated_at:'' } },
+  { id: '3', title: 'Display Farmácia São J.',  contact_id:'c3', stage: 'prospect',   position: 1, estimated_value: 18000, stage_entered_at: new Date(Date.now()-10*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c3', name:'Juliana Paz', company:'Farmácia São J.', created_at:'', updated_at:'' } },
+  { id: '4', title: 'Kit Cosméticos Avon',      contact_id:'c4', stage: 'dinamica',   position: 0, estimated_value: 22000, stage_entered_at: new Date(Date.now()-3*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c4', name:'Roberto Alves', company:'Avon',          created_at:'', updated_at:'' } },
+  { id: '5', title: 'Caixa Vinho Gourmet',      contact_id:'c5', stage: 'potencial',  position: 0, estimated_value: 35000, stage_entered_at: new Date(Date.now()-7*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c5', name:'Marina Costa', company:'Vinhos do Sul',  created_at:'', updated_at:'' } },
+  { id: '6', title: 'Bandeja Padaria Central',  contact_id:'c6', stage: 'visita',     position: 0, estimated_value: 8000,  stage_entered_at: new Date(Date.now()-1*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c6', name:'Paulo Lima', company:'Padaria Central', created_at:'', updated_at:'' } },
+  { id: '7', title: 'Embalagem Cosméticos M.',  contact_id:'c7', stage: 'briefing',   position: 0, estimated_value: 32000, stage_entered_at: new Date(Date.now()-4*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c7', name:'Fernanda R.', company:'Cosmética M.',   created_at:'', updated_at:'' } },
+  { id: '8', title: 'Caixa Presente Boticário', contact_id:'c8', stage: 'aprovacao',  position: 0, estimated_value: 48000, stage_entered_at: new Date(Date.now()-6*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c8', name:'Gustavo N.', company:'O Boticário',    created_at:'', updated_at:'' } },
   { id: '9', title: 'Kit Natal Lojas Renner',  contact_id:'c9', stage: 'fechamento', position: 0, final_value: 87500,         stage_entered_at: new Date(Date.now()-1*86400000).toISOString(), created_at: '', updated_at: '', contact: { id:'c9', name:'Renner Compras', company:'Lojas Renner',  created_at:'', updated_at:'' } },
 ]
 
@@ -70,43 +70,46 @@ function DealCard({ deal, overlay = false, onCardClick }: { deal: Deal; overlay?
       {/* Contact */}
       {deal.contact && (
         <div className="deal-contact">
-          <div className="avatar" style={{ width: '22px', height: '22px', fontSize: '9px' }}>
-            {getInitials(deal.contact.name)}
+          <div className="deal-contact-name">
+            {deal.contact.name}
           </div>
-          <div>
-            <div className="deal-contact-name">
-              {deal.contact.name}
+          {deal.contact.company && (
+            <div className="deal-contact-company">
+              {deal.contact.company}
             </div>
-            {deal.contact.company && (
-              <div className="deal-contact-company">
-                {deal.contact.company}
-              </div>
-            )}
-          </div>
+          )}
         </div>
       )}
 
       {/* Footer */}
       <div className="deal-footer">
-        {/* Value */}
-        {value && cfg.showValue ? (
-          <span className="deal-value">
-            {formatCurrency(value)}
-          </span>
-        ) : <span />}
-
-        {/* Time indicator */}
-        <div className={`deal-time ${isStale ? 'danger' : 'ok'}`}>
-          <Clock size={10} />
-          <span>{days}d</span>
+        <div className="deal-value">
+          {formatCurrency(value || 0)}
         </div>
+
+        {days > 0 && (
+          <div className={`deal-time ${isStale ? 'danger' : 'ok'}`}>
+            <Clock size={10} />
+            <span>{days}d</span>
+          </div>
+        )}
       </div>
     </div>
   )
 }
 
 // ─── Kanban Column ─────────────────────────────────────────────
-function KanbanColumn({ stage, deals, onCardClick }: { stage: DealStage; deals: Deal[]; onCardClick: (deal: Deal) => void }) {
+function KanbanColumn({ 
+  stage, 
+  deals, 
+  onCardClick, 
+  onAddDeal 
+}: { 
+  stage: DealStage
+  deals: Deal[]
+  onCardClick: (deal: Deal) => void
+  onAddDeal: (stage: DealStage) => void
+}) {
   const cfg = STAGE_CONFIG[stage]
   const { setNodeRef } = useDroppable({ id: stage })
   const totalValue = deals.reduce((s, d) => s + (d.final_value ?? d.estimated_value ?? 0), 0)
@@ -150,13 +153,226 @@ function KanbanColumn({ stage, deals, onCardClick }: { stage: DealStage; deals: 
         )}
 
         {/* Add button */}
-        {(stage === 'leads' || stage === 'prospect') && (
-          <button className="kanban-add-btn">
-            <Plus size={14} />
-            <span>Adicionar</span>
-          </button>
-        )}
+        <button onClick={() => onAddDeal(stage)} className="kanban-add-btn">
+          <Plus size={14} />
+          <span>Adicionar</span>
+        </button>
       </div>
+    </div>
+  )
+}
+
+// ─── Bottom Drop Zones (Won / Lost) ───────────────────────────
+function BottomDropZones({ activeId }: { activeId: string | null }) {
+  const { setNodeRef: setWonRef, isOver: isOverWon } = useDroppable({ id: 'drop-zone-pos_venda' })
+  const { setNodeRef: setLostRef, isOver: isOverLost } = useDroppable({ id: 'drop-zone-perdido' })
+
+  return (
+    <div className={`fixed bottom-0 left-0 right-0 h-24 bg-neutral-900/90 border-t border-[var(--line)] backdrop-blur flex items-center justify-center gap-6 p-4 z-40 transition-transform duration-300 ${activeId ? 'translate-y-0' : 'translate-y-full'}`}>
+      <div 
+        ref={setWonRef} 
+        className={`flex-1 max-w-sm h-full rounded-xl border flex items-center justify-center gap-2 font-display text-xs font-bold uppercase transition-all duration-200 ${
+          isOverWon 
+            ? 'bg-emerald-950/80 border-emerald-500 text-emerald-400 scale-[1.02] shadow-lg shadow-emerald-500/20' 
+            : 'bg-neutral-800/40 border-neutral-700/80 text-gray-400'
+        }`}
+      >
+        <Trophy size={16} />
+        <span>Ganho - Pós-Vendas</span>
+      </div>
+
+      <div 
+        ref={setLostRef} 
+        className={`flex-1 max-w-sm h-full rounded-xl border flex items-center justify-center gap-2 font-display text-xs font-bold uppercase transition-all duration-200 ${
+          isOverLost 
+            ? 'bg-rose-950/80 border-rose-500 text-rose-400 scale-[1.02] shadow-lg shadow-rose-500/20' 
+            : 'bg-neutral-800/40 border-neutral-700/80 text-gray-400'
+        }`}
+      >
+        <XCircle size={16} />
+        <span>Perdido - Arquivar</span>
+      </div>
+    </div>
+  )
+}
+
+// ─── Lost Reason Modal ─────────────────────────────────────────
+function LostReasonModal({ 
+  deal, 
+  onConfirm, 
+  onCancel 
+}: { 
+  deal: Deal 
+  onConfirm: (reason: string, notes: string) => void 
+  onCancel: () => void 
+}) {
+  const [reason, setReason] = useState(FOLLOW_UP_LOST_REASONS[0])
+  const [notes, setNotes] = useState('')
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-[var(--charcoal)] border border-[var(--line)] rounded-2xl p-6 w-full max-w-md shadow-2xl flex flex-col gap-4 animate-fade-up">
+        <div>
+          <h3 className="font-display text-base text-[var(--white)] font-bold">Arquivar Negócio</h3>
+          <p className="text-xs text-[var(--gray)] mt-1">Por favor, indique o motivo da perda de <strong>{deal.title}</strong>:</p>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="label">Motivo da Perda</label>
+          <select 
+            className="input" 
+            value={reason} 
+            onChange={(e) => setReason(e.target.value)}
+          >
+            {FOLLOW_UP_LOST_REASONS.map(r => (
+              <option key={r} value={r}>{r}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="label">Observações</label>
+          <textarea 
+            className="input min-h-[80px] py-2 resize-none"
+            placeholder="Justificativa ou notas comerciais..."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+        </div>
+
+        <div className="flex justify-end gap-3 mt-2">
+          <button 
+            type="button" 
+            onClick={onCancel}
+            className="btn btn-secondary py-2 px-4 text-xs font-bold uppercase tracking-wider"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="button" 
+            onClick={() => onConfirm(reason, notes)}
+            className="btn btn-danger py-2 px-4 text-xs font-bold uppercase tracking-wider"
+          >
+            Confirmar Perda
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── New Deal Modal ────────────────────────────────────────────
+function NewDealModal({
+  initialStage = 'leads',
+  onConfirm,
+  onCancel
+}: {
+  initialStage?: DealStage
+  onConfirm: (data: { title: string; contactName: string; company: string; value: number; stage: DealStage }) => void
+  onCancel: () => void
+}) {
+  const [title, setTitle] = useState('')
+  const [contactName, setContactName] = useState('')
+  const [company, setCompany] = useState('')
+  const [value, setValue] = useState(0)
+  const [stage, setStage] = useState<DealStage>(initialStage)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!title.trim() || !contactName.trim()) return
+    onConfirm({ title, contactName, company, value, stage })
+  }
+
+  // Filter out Won/Lost stages from starting stages list
+  const activeStages = Object.keys(STAGE_CONFIG).filter(s => s !== 'perdido' && s !== 'pos_venda') as DealStage[]
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <form onSubmit={handleSubmit} className="bg-[var(--charcoal)] border border-[var(--line)] rounded-2xl p-6 w-full max-w-md shadow-2xl flex flex-col gap-4 animate-fade-up">
+        <div>
+          <h3 className="font-display text-base text-[var(--white)] font-bold">Novo Negócio</h3>
+          <p className="text-xs text-[var(--gray)] mt-1">Preencha as informações básicas do novo lead/oportunidade.</p>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="label">Título da Oportunidade *</label>
+          <input 
+            type="text" 
+            required
+            className="input" 
+            placeholder="Ex: Embalagem Caixa Ovos Carton"
+            value={title} 
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="label">Nome do Contato *</label>
+            <input 
+              type="text" 
+              required
+              className="input" 
+              placeholder="Ex: Alberto Souza"
+              value={contactName} 
+              onChange={(e) => setContactName(e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="label">Empresa / Razão Social</label>
+            <input 
+              type="text" 
+              className="input" 
+              placeholder="Ex: Carton Distribuidora"
+              value={company} 
+              onChange={(e) => setCompany(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="label">Valor Estimado (R$)</label>
+            <input 
+              type="number" 
+              className="input" 
+              placeholder="0"
+              value={value || ''} 
+              onChange={(e) => setValue(Number(e.target.value) || 0)}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="label">Etapa Inicial</label>
+            <select 
+              className="input" 
+              value={stage} 
+              onChange={(e) => setStage(e.target.value as DealStage)}
+            >
+              {activeStages.map(s => (
+                <option key={s} value={s}>{STAGE_CONFIG[s].label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 mt-2">
+          <button 
+            type="button" 
+            onClick={onCancel}
+            className="btn btn-secondary py-2.5 px-4 text-xs font-bold uppercase tracking-wider"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            className="btn btn-primary py-2.5 px-4 text-xs font-bold uppercase tracking-wider text-[#060606]"
+          >
+            Criar Negócio
+          </button>
+        </div>
+      </form>
     </div>
   )
 }
@@ -167,13 +383,28 @@ export function PipelineBoard() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null)
 
+  // Modals state
+  const [searchQuery, setSearchQuery] = useState('')
+  const [lostModalDeal, setLostModalDeal] = useState<Deal | null>(null)
+  const [showNewDealModal, setShowNewDealModal] = useState(false)
+  const [newDealStage, setNewDealStage] = useState<DealStage>('leads')
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
   )
 
-  const stages = Object.keys(STAGE_CONFIG) as DealStage[]
-  const dealsByStage = stages.reduce((acc, stage) => {
-    acc[stage] = deals.filter(d => d.stage === stage).sort((a, b) => a.position - b.position)
+  // Map only active stages to Kanban board columns
+  const activeStages = (Object.keys(STAGE_CONFIG) as DealStage[]).filter(s => s !== 'perdido' && s !== 'pos_venda')
+  
+  // Filter deals based on search query
+  const filteredDeals = deals.filter(d => 
+    d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    d.contact?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    d.contact?.company?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const dealsByStage = (Object.keys(STAGE_CONFIG) as DealStage[]).reduce((acc, stage) => {
+    acc[stage] = filteredDeals.filter(d => d.stage === stage).sort((a, b) => a.position - b.position)
     return acc
   }, {} as Record<DealStage, Deal[]>)
 
@@ -190,8 +421,24 @@ export function PipelineBoard() {
     const draggedDeal = deals.find(d => d.id === active.id)
     if (!draggedDeal) return
 
-    // Check if dropped on a column
-    const newStage = stages.includes(over.id as DealStage)
+    // Drop on Won zone
+    if (over.id === 'drop-zone-pos_venda') {
+      setDeals(prev => prev.map(d =>
+        d.id === draggedDeal.id
+          ? { ...d, stage: 'pos_venda', stage_entered_at: new Date().toISOString() }
+          : d
+      ))
+      return
+    }
+
+    // Drop on Lost zone
+    if (over.id === 'drop-zone-perdido') {
+      setLostModalDeal(draggedDeal)
+      return
+    }
+
+    // Drop on normal columns
+    const newStage = (activeStages as string[]).includes(over.id as string)
       ? (over.id as DealStage)
       : deals.find(d => d.id === over.id)?.stage
 
@@ -209,35 +456,129 @@ export function PipelineBoard() {
     setSelectedDeal(updatedDeal)
   }
 
+  const handleOpenAddDeal = (stage: DealStage) => {
+    setNewDealStage(stage)
+    setShowNewDealModal(true)
+  }
+
+  const handleConfirmNewDeal = (data: { title: string; contactName: string; company: string; value: number; stage: DealStage }) => {
+    const newDeal: Deal = {
+      id: `d-${Date.now()}`,
+      title: data.title,
+      stage: data.stage,
+      estimated_value: data.value,
+      contact_id: `c-${Date.now()}`,
+      contact: {
+        id: `c-${Date.now()}`,
+        name: data.contactName,
+        company: data.company,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      stage_entered_at: new Date().toISOString(),
+      position: deals.filter(d => d.stage === data.stage).length,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+
+    setDeals(prev => [newDeal, ...prev])
+    setShowNewDealModal(false)
+  }
+
+  const handleConfirmLost = (reason: string, notes: string) => {
+    if (!lostModalDeal) return
+    setDeals(prev => prev.map(d =>
+      d.id === lostModalDeal.id
+        ? { 
+            ...d, 
+            stage: 'perdido', 
+            lost_reason: reason, 
+            lost_notes: notes,
+            stage_entered_at: new Date().toISOString() 
+          }
+        : d
+    ))
+    setLostModalDeal(null)
+  }
+
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="pipeline-wrap">
-        <div className="kanban-board">
-          {stages.map(stage => (
-            <KanbanColumn 
-              key={stage} 
-              stage={stage} 
-              deals={dealsByStage[stage]} 
-              onCardClick={setSelectedDeal}
+    <div className="page-content animate-fade-in w-full h-full flex flex-col gap-4 overflow-hidden">
+      {/* Page Header */}
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="font-display text-2xl md:text-3xl text-[var(--white)] font-bold tracking-tight">
+          Pipeline de Vendas
+        </h1>
+
+        <div className="flex items-center gap-2">
+          <div className="search-wrap">
+            <Search size={14} />
+            <input
+              className="search-input"
+              placeholder="Buscar negócio..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
-          ))}
+          </div>
+          
+          <button className="btn btn-primary btn-sm" onClick={() => handleOpenAddDeal('leads')}>
+            <Plus size={13} />
+            <span>Novo Negócio</span>
+          </button>
         </div>
       </div>
 
-      <DragOverlay>
-        {activeDeal && <DealCard deal={activeDeal} overlay />}
-      </DragOverlay>
+      {/* Board */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="pipeline-wrap">
+          <div className="kanban-board">
+            {activeStages.map(stage => (
+              <KanbanColumn 
+                key={stage} 
+                stage={stage} 
+                deals={dealsByStage[stage]} 
+                onCardClick={setSelectedDeal}
+                onAddDeal={handleOpenAddDeal}
+              />
+            ))}
+          </div>
+        </div>
 
+        <DragOverlay>
+          {activeDeal && <DealCard deal={activeDeal} overlay />}
+        </DragOverlay>
+
+        <BottomDropZones activeId={activeId} />
+      </DndContext>
+
+      {/* Deal Detail Drawer */}
       <DealDrawer
         deal={selectedDeal}
         onClose={() => setSelectedDeal(null)}
         onUpdateDeal={handleUpdateDeal}
       />
-    </DndContext>
+
+      {/* Lost Reason Modal */}
+      {lostModalDeal && (
+        <LostReasonModal 
+          deal={lostModalDeal}
+          onConfirm={handleConfirmLost}
+          onCancel={() => setLostModalDeal(null)}
+        />
+      )}
+
+      {/* New Deal Modal */}
+      {showNewDealModal && (
+        <NewDealModal
+          initialStage={newDealStage}
+          onConfirm={handleConfirmNewDeal}
+          onCancel={() => setShowNewDealModal(false)}
+        />
+      )}
+    </div>
   )
 }
