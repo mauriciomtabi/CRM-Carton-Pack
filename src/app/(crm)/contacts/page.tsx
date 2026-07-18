@@ -350,15 +350,7 @@ function ContactDrawer({
         {/* Header */}
         <div className="p-6 border-b border-[var(--line)] flex justify-between items-start bg-[var(--card)]">
           <div>
-            <span className="font-mono text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider"
-              style={{
-                background: curve === 'A' ? 'rgba(180,217,50,0.12)' : curve === 'B' ? 'rgba(240,196,25,0.1)' : 'rgba(255,255,255,0.05)',
-                color: curve === 'A' ? 'var(--lime)' : curve === 'B' ? 'var(--yellow)' : 'var(--gray)',
-                border: `1px solid ${curve === 'A' ? 'rgba(180,217,50,0.25)' : curve === 'B' ? 'rgba(240,196,25,0.2)' : 'var(--line)'}`
-              }}>
-              Curva {curve}
-            </span>
-            <h2 className="font-display text-lg text-[var(--white)] mt-1.5">{company}</h2>
+            <h2 className="font-display text-lg text-[var(--white)]">{company}</h2>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-[var(--white)] p-1 rounded-md hover:bg-[var(--line)] transition-colors">
             <X size={18} />
@@ -494,7 +486,7 @@ function ContactDrawer({
                     </div>
 
                     <div className="flex flex-col md:flex-row gap-3">
-                      <div className="flex flex-col gap-1.5 md:w-[130px] shrink-0">
+                      <div className="flex flex-col gap-1.5 md:w-[155px] shrink-0">
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CNPJ</label>
                         <input 
                           type="text" 
@@ -505,7 +497,7 @@ function ContactDrawer({
                         />
                       </div>
 
-                      <div className="flex flex-col gap-1.5 md:w-[120px] shrink-0">
+                      <div className="flex flex-col gap-1.5 md:w-[135px] shrink-0">
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Telefone</label>
                         <input 
                           type="text" 
@@ -520,7 +512,7 @@ function ContactDrawer({
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">E-mail</label>
                         <input 
                           type="email" 
-                          className="input text-[11px] py-1.5 truncate" 
+                          className="input text-[10px] py-1.5 truncate" 
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           onBlur={() => handleSaveGeneral()}
@@ -671,12 +663,12 @@ function ContactDrawer({
                       />
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="flex flex-col gap-1 flex-1 min-w-0">
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Situação Especial</label>
                         <input 
                           type="text" 
-                          className="input text-[11px] py-1.5 truncate" 
+                          className="input text-[10px] py-1.5 truncate" 
                           value={specialSituation}
                           onChange={(e) => setSpecialSituation(e.target.value)}
                           onBlur={() => handleSaveGeneral()}
@@ -687,7 +679,7 @@ function ContactDrawer({
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Data Situação</label>
                         <input 
                           type="text" 
-                          className="input text-[11px] py-1.5 text-center font-mono" 
+                          className="input text-[10px] py-1.5 text-center font-mono" 
                           value={specialSituationDate}
                           onChange={(e) => setSpecialSituationDate(e.target.value)}
                           onBlur={() => handleSaveGeneral()}
@@ -1399,6 +1391,9 @@ export default function ContactsPage() {
       registrationStatus: data.registrationStatus || 'ATIVA',
       mainCnae: data.mainCnae || '',
       address: data.address || '',
+      bairro: data.bairro || '',
+      cep: data.cep || '',
+      sideActivities: data.sideActivities || [],
       taxRegime: data.taxRegime || 'Simples Nacional',
       specialSituation: data.specialSituation || 'Nenhuma',
       specialSituationDate: data.specialSituationDate || '-',
