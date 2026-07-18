@@ -13,7 +13,9 @@ import {
   User,
   X,
   Shield,
-  Clock
+  Clock,
+  AlertTriangle,
+  CheckCircle
 } from 'lucide-react'
 
 interface TeamUser {
@@ -75,6 +77,10 @@ export default function UsersPage() {
     tempPassword: string
     type: 'cartonpack' | 'externo'
   } | null>(null)
+
+  // Custom dialog states
+  const [toastMessage, setToastMessage] = useState('')
+  const [userToDelete, setUserToDelete] = useState<string | null>(null)
 
   // Load from localStorage
   useEffect(() => {
@@ -214,10 +220,7 @@ export default function UsersPage() {
 
   // Delete user
   const handleDelete = (id: string) => {
-    if (confirm('Tem certeza que deseja excluir este usuário?')) {
-      const updated = users.filter(u => u.id !== id)
-      saveUsers(updated)
-    }
+    setUserToDelete(id)
   }
 
   // Toggle user status quickly
@@ -668,13 +671,62 @@ ${createdUserCredentials.type === 'cartonpack'
               onClick={() => {
                 const text = `Olá, ${createdUserCredentials.name}! Seu acesso ao CRM Carton Pack está liberado.\n\nLink de Acesso: https://crm.cartonpack.com\n${createdUserCredentials.type === 'cartonpack' ? `Login (E-mail): ${createdUserCredentials.usernameOrEmail}` : `Usuário: ${createdUserCredentials.usernameOrEmail}`}\nSenha Temporária: ${createdUserCredentials.tempPassword}\n\n${createdUserCredentials.type === 'cartonpack' ? 'Obs: No primeiro acesso você deverá alterar a senha temporária e confirmar o link de ativação enviado para o seu e-mail.' : 'Obs: No primeiro acesso você deverá alterar a senha temporária para ativar sua conta.'}`
                 navigator.clipboard.writeText(text)
-                alert('Mensagem de acesso copiada com sucesso!')
+                setToastMessage('Mensagem de acesso copiada com sucesso!')
+                setTimeout(() => setToastMessage(''), 3000)
               }}
               className="btn btn-primary py-2.5 text-xs font-bold uppercase tracking-wider text-black w-full"
             >
               Copiar Mensagem de Acesso
             </button>
           </div>
+        </div>
+      )}
+      {/* Custom Delete Confirmation Dialog */}
+      {userToDelete && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 text-left">
+          <div className="bg-[var(--charcoal)] border border-[var(--line)] rounded-2xl p-6 w-full max-w-sm shadow-2xl flex flex-col gap-4 animate-fade-up">
+            <div className="flex items-center gap-2 text-red-500">
+              <AlertTriangle size={18} />
+              <h3 className="font-display text-base font-bold">Excluir Usuário</h3>
+            </div>
+            
+            <p className="text-xs text-[var(--gray)] font-mono leading-relaxed">
+              Tem certeza que deseja excluir o usuário <strong className="text-[var(--white)]">{users.find(u => u.id === userToDelete)?.name}</strong>? Esta ação removerá permanentemente o acesso dele ao sistema Carton Pack.
+            </p>
+
+            <div className="flex justify-end gap-3 mt-2 border-t border-[var(--line)] pt-3">
+              <button
+                type="button"
+                onClick={() => setUserToDelete(null)}
+                className="btn btn-secondary py-2 px-4 text-xs font-bold uppercase tracking-wider"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (userToDelete) {
+                    const updated = users.filter(u => u.id !== userToDelete)
+                    saveUsers(updated)
+                    setUserToDelete(null)
+                    setToastMessage('Usuário excluído com sucesso!')
+                    setTimeout(() => setToastMessage(''), 3000)
+                  }
+                }}
+                className="btn bg-[var(--red)] text-white hover:bg-[#ef4444] border-none py-2 px-4 text-xs font-bold uppercase tracking-wider"
+              >
+                Confirmar Exclusão
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 bg-[#1a1c1e] border border-[var(--lime)] rounded-xl p-4 text-xs font-bold text-[var(--lime)] shadow-2xl flex items-center gap-2 animate-fade-in z-[999999]">
+          <CheckCircle size={15} />
+          <span>{toastMessage}</span>
         </div>
       )}
 
