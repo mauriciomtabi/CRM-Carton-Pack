@@ -842,11 +842,11 @@ function NewContactModal({
         {/* Dashboard 2-Column Split Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 border-t border-[var(--line)] pt-4 max-h-[64vh] overflow-y-auto pr-1">
           
-          {/* LEFT COLUMN (2/3 width): Cadastral Info and CNAE */}
-          <div className="lg:col-span-2 flex flex-col gap-4">
+          {/* LEFT COLUMN (2/3 width): Cadastral Info */}
+          <div className="lg:col-span-2 flex flex-col gap-4 h-full">
             
-            {/* Card 1: Identificação Geral */}
-            <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
+            {/* Card 1: Identificação Geral — flex-1 to match height of Inscrições card */}
+            <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3 flex-1">
               <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Dados Cadastrais</h4>
               
               <div className="flex flex-col gap-1">
