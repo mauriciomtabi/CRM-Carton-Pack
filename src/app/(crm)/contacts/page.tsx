@@ -255,13 +255,34 @@ function ContactDrawer({
       setCity(contact.city)
       setState(contact.state)
       setStatus(contact.status)
-      setBairro(contact.bairro ?? '')
-      setCep(contact.cep ?? '')
+      
+      // Fallback address parsing if bairro and cep are empty in state
+      let parsedAddress = contact.address ?? ''
+      let parsedBairro = contact.bairro ?? ''
+      let parsedCep = contact.cep ?? ''
+
+      if (!parsedBairro && !parsedCep && parsedAddress.includes(' - ')) {
+        const parts = parsedAddress.split(' - ')
+        parsedAddress = parts[0] || ''
+        
+        const bairroPart = parts.find(p => p.toLowerCase().includes('bairro')) || parts[1]
+        if (bairroPart) {
+          parsedBairro = bairroPart.replace(/bairro:\s*/i, '').replace(/bairro\s+/i, '').trim()
+        }
+        
+        const cepPart = parts.find(p => p.toLowerCase().includes('cep:')) || parts.find(p => p.match(/\d{5}-\d{3}/))
+        if (cepPart) {
+          parsedCep = cepPart.replace(/cep:\s*/i, '').trim()
+        }
+      }
+
+      setAddress(parsedAddress)
+      setBairro(parsedBairro)
+      setCep(parsedCep)
       setSideActivities(contact.sideActivities ?? [])
       setShowSideActivities(false)
       setRegistrationStatus(contact.registrationStatus ?? 'ATIVA')
       setMainCnae(contact.mainCnae ?? '')
-      setAddress(contact.address ?? '')
       setTaxRegime(contact.taxRegime ?? 'Simples Nacional')
       setSpecialSituation(contact.specialSituation ?? 'Nenhuma')
       setSpecialSituationDate(contact.specialSituationDate ?? '-')
@@ -512,7 +533,7 @@ function ContactDrawer({
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">E-mail</label>
                         <input 
                           type="email" 
-                          className="input text-[10px] py-1.5 truncate" 
+                          className="input text-[9px] py-1.5 truncate" 
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           onBlur={() => handleSaveGeneral()}
@@ -664,7 +685,7 @@ function ContactDrawer({
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="flex flex-col gap-1 flex-1 min-w-0">
+                      <div className="flex flex-col gap-1">
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Situação Especial</label>
                         <input 
                           type="text" 
@@ -675,7 +696,7 @@ function ContactDrawer({
                         />
                       </div>
 
-                      <div className="flex flex-col gap-1 w-[90px] shrink-0">
+                      <div className="flex flex-col gap-1">
                         <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Data Situação</label>
                         <input 
                           type="text" 
@@ -965,6 +986,7 @@ function NewContactModal({
       address,
       bairro,
       cep,
+      sideActivities,
       taxRegime,
       specialSituation,
       specialSituationDate,
