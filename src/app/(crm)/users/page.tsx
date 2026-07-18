@@ -138,14 +138,28 @@ export default function UsersPage() {
     setShowModal(true)
   }
 
+  const capitalizeName = (n: string) => {
+    return n
+      .trim()
+      .split(/\s+/)
+      .map(word => {
+        if (word.length === 0) return ''
+        const lower = word.toLowerCase()
+        if (['de', 'do', 'da', 'dos', 'das', 'e'].includes(lower)) return lower
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      })
+      .join(' ')
+  }
+
   // Submit modal form
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim() || (role !== 'representante' && !email.trim())) return
 
+    const formattedName = capitalizeName(name)
     const isCarton = role !== 'representante' && email.toLowerCase().endsWith('@cartonpack.com')
-    const finalUsername = isCarton ? undefined : (username || deriveUsername(name))
-    const finalEmail = role === 'representante' ? `${finalUsername || deriveUsername(name)}@representante.local` : email
+    const finalUsername = isCarton ? undefined : (username || deriveUsername(formattedName))
+    const finalEmail = role === 'representante' ? `${finalUsername || deriveUsername(formattedName)}@representante.local` : email
 
     if (editingUser) {
       // Edit mode
@@ -153,7 +167,7 @@ export default function UsersPage() {
         u.id === editingUser.id 
           ? { 
               ...u, 
-              name, 
+              name: formattedName, 
               email: finalEmail, 
               role, 
               status, 
@@ -171,7 +185,7 @@ export default function UsersPage() {
 
       const newUser: TeamUser = {
         id: `u-${Date.now()}`,
-        name,
+        name: formattedName,
         email: finalEmail,
         role,
         status,
@@ -187,7 +201,7 @@ export default function UsersPage() {
       
       // Save credentials for the Copy Screen
       setCreatedUserCredentials({
-        name,
+        name: formattedName,
         usernameOrEmail: isCarton ? finalEmail : (finalUsername || finalEmail),
         tempPassword: finalTempPassword,
         type: isCarton ? 'cartonpack' : 'externo'
