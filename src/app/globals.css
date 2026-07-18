@@ -695,7 +695,61 @@ a, button, input, select, textarea {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: var(--stat-glow-bg, rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--line);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.stat-icon svg {
+  fill: currentColor;
+  fill-opacity: 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card:hover .stat-icon {
+  background: var(--stat-glow-bg);
+  border-color: var(--stat-glow-border);
+  box-shadow: 0 0 15px var(--stat-glow-color);
+}
+
+.stat-card:hover .stat-icon svg {
+  fill-opacity: 0.25;
+  transform: scale(1.08);
+}
+
+/* ══════════════ SECTION HEADER ICONS ══════════════ */
+.section-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--charcoal);
+  border: 1px solid var(--line);
+  color: var(--gray);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.section-header-icon svg {
+  fill: currentColor;
+  fill-opacity: 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover .section-header-icon {
+  color: var(--lime);
+  background: rgba(180, 217, 50, 0.08);
+  border-color: rgba(180, 217, 50, 0.2);
+  box-shadow: 0 0 12px rgba(180, 217, 50, 0.2);
+}
+
+.card:hover .section-header-icon svg {
+  fill-opacity: 0.2;
+  transform: scale(1.06);
+}
+
 
 /* ══════════════ FORM ELEMENTS ══════════════ */
 .input {

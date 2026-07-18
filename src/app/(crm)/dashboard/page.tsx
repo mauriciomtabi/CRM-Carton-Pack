@@ -160,42 +160,42 @@ export default function DashboardPage() {
 
       {/* Stats Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="stat-card" style={{ '--stat-color': 'var(--lime)' } as React.CSSProperties}>
+        <div className="stat-card" style={{ '--stat-color': 'var(--lime)', '--stat-glow-bg': 'rgba(180,217,50,0.12)', '--stat-glow-border': 'rgba(180,217,50,0.25)', '--stat-glow-color': 'rgba(180,217,50,0.35)' } as React.CSSProperties}>
           <div>
             <div className="stat-value text-[var(--lime)]">{activeDealsCount}</div>
             <div className="stat-label">Negócios Ativos</div>
           </div>
-          <div className="stat-icon bg-[rgba(180,217,50,0.1)]">
+          <div className="stat-icon">
             <Package size={20} className="text-[var(--lime)]" />
           </div>
         </div>
 
-        <div className="stat-card" style={{ '--stat-color': 'var(--green)' } as React.CSSProperties}>
+        <div className="stat-card" style={{ '--stat-color': 'var(--green)', '--stat-glow-bg': 'rgba(72,199,103,0.12)', '--stat-glow-border': 'rgba(72,199,103,0.25)', '--stat-glow-color': 'rgba(72,199,103,0.35)' } as React.CSSProperties}>
           <div>
             <div className="stat-value text-[var(--green)]">{formatCurrency(fechamentoValue)}</div>
             <div className="stat-label">Fechamentos (mês)</div>
           </div>
-          <div className="stat-icon bg-[rgba(72,199,103,0.1)]">
+          <div className="stat-icon">
             <CheckCircle size={20} className="text-[var(--green)]" />
           </div>
         </div>
 
-        <div className="stat-card" style={{ '--stat-color': 'var(--yellow)' } as React.CSSProperties}>
+        <div className="stat-card" style={{ '--stat-color': 'var(--yellow)', '--stat-glow-bg': 'rgba(240,196,25,0.12)', '--stat-glow-border': 'rgba(240,196,25,0.25)', '--stat-glow-color': 'rgba(240,196,25,0.35)' } as React.CSSProperties}>
           <div>
             <div className="stat-value text-[var(--yellow)]">{inNegotiationCount}</div>
             <div className="stat-label">Em Negociação</div>
           </div>
-          <div className="stat-icon bg-[rgba(240,196,25,0.1)]">
+          <div className="stat-icon">
             <TrendingUp size={20} className="text-[var(--yellow)]" />
           </div>
         </div>
 
-        <div className="stat-card" style={{ '--stat-color': 'var(--red)' } as React.CSSProperties}>
+        <div className="stat-card" style={{ '--stat-color': 'var(--red)', '--stat-glow-bg': 'rgba(226,72,61,0.12)', '--stat-glow-border': 'rgba(226,72,61,0.25)', '--stat-glow-color': 'rgba(226,72,61,0.35)' } as React.CSSProperties}>
           <div>
             <div className="stat-value text-[var(--red)]">{formatCurrency(perdidoValue)}</div>
             <div className="stat-label">Perdidos (mês)</div>
           </div>
-          <div className="stat-icon bg-[rgba(226,72,61,0.1)]">
+          <div className="stat-icon">
             <XCircle size={20} className="text-[var(--red)]" />
           </div>
         </div>
@@ -205,8 +205,11 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Funil de Vendas */}
         <div className="card p-6 lg:col-span-2">
-          <h2 className="font-display text-sm mb-6 text-[var(--white)] flex items-center gap-2">
-            <span>📊</span> Funil de Vendas
+          <h2 className="font-display text-sm mb-6 text-[var(--white)] flex items-center gap-3">
+            <div className="section-header-icon">
+              <TrendingUp size={16} />
+            </div>
+            Funil de Vendas
           </h2>
           <div className="flex flex-col gap-4">
             {funnelSummary.map(({ stage, count, value, color }) => (
@@ -240,8 +243,10 @@ export default function DashboardPage() {
         {/* Negócios Parados / Stale Deals */}
         <div className="card p-6 flex flex-col justify-between">
           <div>
-            <h2 className="font-display text-sm mb-4 text-[var(--white)] flex items-center gap-2">
-              <AlertTriangle size={16} className="text-[var(--yellow)]" />
+            <h2 className="font-display text-sm mb-4 text-[var(--white)] flex items-center gap-3">
+              <div className="section-header-icon">
+                <AlertTriangle size={16} className="text-[var(--yellow)]" />
+              </div>
               Negócios Parados
             </h2>
             <div className="flex flex-col gap-3 overflow-y-auto max-h-[300px]">
@@ -291,8 +296,10 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Alerta de Inatividade Clientes (briefing requirement: curve, inactive warnings) */}
         <div className="card p-6 lg:col-span-2">
-          <h2 className="font-display text-sm mb-4 text-[var(--white)] flex items-center gap-2">
-            <AlertTriangle size={16} className="text-[var(--red)]" />
+          <h2 className="font-display text-sm mb-4 text-[var(--white)] flex items-center gap-3">
+            <div className="section-header-icon">
+              <AlertTriangle size={16} className="text-[var(--red)]" />
+            </div>
             Alertas de Inatividade (Recorrência Excedida)
           </h2>
           <div className="overflow-x-auto">
@@ -346,8 +353,11 @@ export default function DashboardPage() {
         {/* Curva ABC Distribution details */}
         <div className="card p-6 flex flex-col justify-between">
           <div>
-            <h2 className="font-display text-sm mb-4 text-[var(--white)] flex items-center gap-2">
-              <span>🎯</span> Distribuição Curva ABC
+            <h2 className="font-display text-sm mb-4 text-[var(--white)] flex items-center gap-3">
+              <div className="section-header-icon">
+                <Package size={16} className="text-[var(--lime)]" />
+              </div>
+              Distribuição Curva ABC
             </h2>
             <div className="flex flex-col gap-4">
               {curveStats.map(({ curve, count, value }) => (
