@@ -552,22 +552,22 @@ export function DealDrawer({ deal, onClose, onUpdateDeal }: DealDrawerProps) {
                 </div>
 
                 {/* Resumo Faturamento Sugerido */}
-                <div className="bg-neutral-900 border border-[var(--line)] rounded-xl p-4 flex flex-col gap-2 mt-2">
+                <div className="bg-[var(--card2)] border border-[var(--line)] rounded-xl p-4 flex flex-col gap-2 mt-2">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-400">Custo Total de Produção:</span>
-                    <span className="font-mono text-white">{formatCurrency(productionCost)}</span>
+                    <span className="text-[var(--gray)]">Custo Total de Produção:</span>
+                    <span className="font-mono text-[var(--white)] font-bold">{formatCurrency(productionCost)}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs border-b border-[var(--line)] pb-2 mb-2">
-                    <span className="text-gray-400">Área de Papelão (Unitária):</span>
-                    <span className="font-mono text-white">{boxAreaM2.toFixed(3)} m²</span>
+                    <span className="text-[var(--gray)]">Área de Papelão (Unitária):</span>
+                    <span className="font-mono text-[var(--white)] font-bold">{boxAreaM2.toFixed(3)} m²</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold text-gray-300">Preço Unitário Sugerido:</span>
+                    <span className="text-xs font-bold text-[var(--white)] opacity-80">Preço Unitário Sugerido:</span>
                     <span className="font-mono text-sm font-black text-[var(--lime)]">{formatCurrency(unitPrice)}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold text-gray-300">Valor Total Sugerido:</span>
+                    <span className="text-xs font-bold text-[var(--white)] opacity-80">Valor Total Sugerido:</span>
                     <span className="font-mono text-lg font-black text-[var(--lime)]" style={{ filter: 'drop-shadow(0 0 8px rgba(180,217,50,0.25))' }}>
                       {formatCurrency(totalSuggested)}
                     </span>

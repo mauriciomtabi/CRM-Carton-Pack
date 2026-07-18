@@ -73,6 +73,15 @@
   --gray:      #475569;
   --gray2:     #94a3b8;
 
+  /* High-contrast brand colors for light backgrounds */
+  --lime:      #769602;   /* Rich olive-lime green */
+  --lime-dim:  #536b01;
+  --lime-soft: rgba(118, 150, 2, 0.08);
+  --lime-glow: rgba(118, 150, 2, 0.15);
+  --green:     #15803d;   /* Forest green */
+  --yellow:    #a16207;   /* Amber gold */
+  --red:       #b91c1c;   /* Crimson red */
+
   --opacity-hover:          rgba(15, 23, 42, 0.04);
   --opacity-hover-heavy:    rgba(15, 23, 42, 0.08);
   --opacity-border-light:   rgba(15, 23, 42, 0.06);
@@ -84,7 +93,7 @@
   --shadow-sm:    0 2px 8px rgba(15,23,42,0.04);
   --shadow-md:    0 4px 24px rgba(15,23,42,0.08);
   --shadow-lg:    0 8px 48px rgba(15,23,42,0.12);
-  --shadow-lime:  0 8px 32px rgba(126,160,8,0.15);
+  --shadow-lime:  0 8px 32px rgba(118, 150, 2, 0.15);
 }
 
 /* ══════════════ RESET ══════════════ */
@@ -364,7 +373,7 @@ a, button, input, select, textarea {
 
 .btn-primary {
   background: var(--lime);
-  color: var(--black);
+  color: #060606;
   border: 1px solid var(--lime);
   box-shadow: 0 4px 20px rgba(180,217,50,0.25);
 }
@@ -396,10 +405,12 @@ a, button, input, select, textarea {
 
 .btn-danger {
   background: transparent;
-  color: #fca5a5;
-  border: 1px solid rgba(226,72,61,0.3);
+  color: var(--red);
+  border: 1px solid var(--red);
 }
-.btn-danger:hover { background: rgba(226,72,61,0.1); }
+.btn-danger:hover {
+  background: color-mix(in srgb, var(--red) 10%, transparent);
+}
 
 .btn-sm  { padding: 5px 12px; font-size: 10px; border-radius: 6px; }
 .btn-lg  { padding: 12px 28px; font-size: 13px; }
@@ -769,7 +780,7 @@ a, button, input, select, textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--gray);
+  color: var(--white);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
 }
