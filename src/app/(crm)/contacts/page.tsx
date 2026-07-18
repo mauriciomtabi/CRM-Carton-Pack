@@ -115,12 +115,17 @@ function buildAddress(d: any) {
 function ContactDrawer({ 
   contact, 
   onClose, 
-  onUpdateContact 
+  onUpdateContact,
+  representatives = []
 }: { 
   contact: MockContact | null
   onClose: () => void
   onUpdateContact: (contact: MockContact) => void
+  representatives?: string[]
 }) {
+  const representativesList = representatives.length > 0 
+    ? representatives 
+    : ['Ana Lima', 'Ermínio', 'Carlos Mendes']
   const [isOpen, setIsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'geral' | 'historico'>('geral')
 
@@ -184,7 +189,10 @@ function ContactDrawer({
 
   if (!contact) return null
 
-  const handleSaveGeneral = () => {
+  const handleSaveGeneral = (overrides?: Partial<MockContact> | React.FocusEvent) => {
+    const cleanOverrides = overrides && !(overrides as any).nativeEvent 
+      ? (overrides as Partial<MockContact>) 
+      : {}
     onUpdateContact({
       ...contact,
       name,
@@ -204,7 +212,8 @@ function ContactDrawer({
       taxRegime,
       specialSituation,
       specialSituationDate,
-      stateRegistration
+      stateRegistration,
+      ...cleanOverrides
     })
   }
 
@@ -287,6 +296,61 @@ function ContactDrawer({
           {activeTab === 'geral' && (
             <div className="flex flex-col gap-5 animate-fade-in pb-12">
               
+              {/* Seção Destaques no Topo: Curva, Representante e Status */}
+              <div className="grid grid-cols-3 gap-3 p-4 bg-[var(--card2)] border border-[var(--line)] rounded-xl">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Curva ABC</label>
+                  <select 
+                    className="input text-xs py-1 px-2 font-bold text-[var(--lime)] font-mono bg-[var(--charcoal)]"
+                    value={curve} 
+                    onChange={(e) => {
+                      const val = e.target.value as any
+                      setCurve(val)
+                      handleSaveGeneral({ curve: val })
+                    }}
+                  >
+                    <option value="A">Curva A</option>
+                    <option value="B">Curva B</option>
+                    <option value="C">Curva C</option>
+                    <option value="D">Curva D</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Representante</label>
+                  <select 
+                    className="input text-xs py-1 px-2 font-bold bg-[var(--charcoal)]"
+                    value={representative} 
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setRepresentative(val)
+                      handleSaveGeneral({ representative: val })
+                    }}
+                  >
+                    {representativesList.map(rep => (
+                      <option key={rep} value={rep}>{rep}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Status Carteira</label>
+                  <select 
+                    className="input text-xs py-1 px-2 font-bold bg-[var(--charcoal)]"
+                    style={{ color: status === 'ativo' ? 'var(--green)' : 'var(--red)' }}
+                    value={status} 
+                    onChange={(e) => {
+                      const val = e.target.value as any
+                      setStatus(val)
+                      handleSaveGeneral({ status: val })
+                    }}
+                  >
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                  </select>
+                </div>
+              </div>
+              
               {/* Seção: Identificação */}
               <div>
                 <h3 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3 border-b border-[var(--line)] pb-1">Identificação</h3>
@@ -362,7 +426,7 @@ function ContactDrawer({
                           style={{ color: registrationStatus.includes('ATIVA') ? 'var(--green)' : 'var(--white)' }}
                           value={registrationStatus} 
                           onChange={(e) => setRegistrationStatus(e.target.value)}
-                          onBlur={handleSaveGeneral}
+                          onBlur={() => handleSaveGeneral()}
                         />
                       </div>
                     </div>
@@ -374,8 +438,10 @@ function ContactDrawer({
                         <select 
                           className="input" 
                           value={taxRegime} 
-                          onChange={(e) => setTaxRegime(e.target.value as any)}
-                          onBlur={handleSaveGeneral}
+                          onChange={(e) => {
+                            setTaxRegime(e.target.value as any)
+                            handleSaveGeneral({ taxRegime: e.target.value as any })
+                          }}
                         >
                           <option value="MEI">MEI</option>
                           <option value="Simples Nacional">Simples Nacional</option>
@@ -408,37 +474,22 @@ function ContactDrawer({
                         placeholder="Insira a IE manualmente"
                         value={stateRegistration} 
                         onChange={(e) => setStateRegistration(e.target.value)}
-                        onBlur={handleSaveGeneral}
+                        onBlur={() => handleSaveGeneral()}
                       />
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <label className="label">Curva ABC</label>
-                      <select 
-                        className="input" 
-                        value={curve} 
-                        onChange={(e) => setCurve(e.target.value as any)}
-                        onBlur={handleSaveGeneral}
-                      >
-                        <option value="A">Curva A</option>
-                        <option value="B">Curva B</option>
-                        <option value="C">Curva C</option>
-                        <option value="D">Curva D</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="label">CNAE Principal</label>
-                    <div className="relative">
-                      <FileSpreadsheet size={14} className="absolute text-gray-500" />
-                      <input 
-                        type="text" 
-                        className="input" 
-                        value={mainCnae} 
-                        onChange={(e) => setMainCnae(e.target.value)}
-                        onBlur={handleSaveGeneral}
-                      />
+                      <label className="label">CNAE Principal</label>
+                      <div className="relative">
+                        <FileSpreadsheet size={14} className="absolute text-gray-500" />
+                        <input 
+                          type="text" 
+                          className="input" 
+                          value={mainCnae} 
+                          onChange={(e) => setMainCnae(e.target.value)}
+                          onBlur={() => handleSaveGeneral()}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -450,7 +501,7 @@ function ContactDrawer({
                         className="input" 
                         value={specialSituation} 
                         onChange={(e) => setSpecialSituation(e.target.value)}
-                        onBlur={handleSaveGeneral}
+                        onBlur={() => handleSaveGeneral()}
                       />
                     </div>
 
@@ -461,7 +512,7 @@ function ContactDrawer({
                         className="input" 
                         value={specialSituationDate} 
                         onChange={(e) => setSpecialSituationDate(e.target.value)}
-                        onBlur={handleSaveGeneral}
+                        onBlur={() => handleSaveGeneral()}
                       />
                     </div>
                   </div>
@@ -524,7 +575,7 @@ function ContactDrawer({
                         className="input" 
                         value={city} 
                         onChange={(e) => setCity(e.target.value)}
-                        onBlur={handleSaveGeneral}
+                        onBlur={() => handleSaveGeneral()}
                       />
                     </div>
 
@@ -536,34 +587,8 @@ function ContactDrawer({
                         className="input uppercase text-center font-bold font-mono" 
                         value={state} 
                         onChange={(e) => setState(e.target.value.toUpperCase())}
-                        onBlur={handleSaveGeneral}
+                        onBlur={() => handleSaveGeneral()}
                       />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">Representante</label>
-                      <input 
-                        type="text" 
-                        className="input" 
-                        value={representative} 
-                        onChange={(e) => setRepresentative(e.target.value)}
-                        onBlur={handleSaveGeneral}
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label className="label">Status Carteira</label>
-                      <select 
-                        className="input" 
-                        value={status} 
-                        onChange={(e) => setStatus(e.target.value as any)}
-                        onBlur={handleSaveGeneral}
-                      >
-                        <option value="ativo">Ativo</option>
-                        <option value="inativo">Inativo</option>
-                      </select>
                     </div>
                   </div>
                 </div>
@@ -1423,6 +1448,7 @@ export default function ContactsPage() {
         contact={selectedContact}
         onClose={() => setSelectedContact(null)}
         onUpdateContact={handleUpdateContact}
+        representatives={representatives}
       />
 
       {/* New Contact Modal with CNPJ Autopopulate */}
