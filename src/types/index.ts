@@ -50,6 +50,7 @@ export interface Contact {
   state?: string
   source?: string
   notes?: string
+  curve?: 'A' | 'B' | 'C' | 'D'
   assigned_to?: string
   assigned_profile?: Profile
   created_at: string

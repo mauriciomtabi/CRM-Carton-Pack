@@ -21,6 +21,7 @@ import { useDroppable } from '@dnd-kit/core'
 import { Deal, DealStage, STAGE_CONFIG } from '@/types'
 import { formatCurrency, daysSince, getInitials } from '@/lib/utils'
 import { Plus, Clock } from 'lucide-react'
+import { DealDrawer } from './DealDrawer'
 
 // ─── Mock data ────────────────────────────────────────────────
 const MOCK_DEALS: Deal[] = [
@@ -36,7 +37,7 @@ const MOCK_DEALS: Deal[] = [
 ]
 
 // ─── Deal Card ────────────────────────────────────────────────
-function DealCard({ deal, overlay = false }: { deal: Deal; overlay?: boolean }) {
+function DealCard({ deal, overlay = false, onCardClick }: { deal: Deal; overlay?: boolean; onCardClick?: (deal: Deal) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: deal.id })
   const cfg = STAGE_CONFIG[deal.stage]
   const days = daysSince(deal.stage_entered_at)
@@ -58,7 +59,8 @@ function DealCard({ deal, overlay = false }: { deal: Deal; overlay?: boolean }) 
       style={style}
       {...attributes}
       {...listeners}
-      className="deal-card animate-fade-in"
+      onClick={() => onCardClick?.(deal)}
+      className="deal-card animate-fade-in cursor-pointer"
     >
       {/* Title */}
       <div className="deal-title">
@@ -104,7 +106,7 @@ function DealCard({ deal, overlay = false }: { deal: Deal; overlay?: boolean }) 
 }
 
 // ─── Kanban Column ─────────────────────────────────────────────
-function KanbanColumn({ stage, deals }: { stage: DealStage; deals: Deal[] }) {
+function KanbanColumn({ stage, deals, onCardClick }: { stage: DealStage; deals: Deal[]; onCardClick: (deal: Deal) => void }) {
   const cfg = STAGE_CONFIG[stage]
   const { setNodeRef } = useDroppable({ id: stage })
   const totalValue = deals.reduce((s, d) => s + (d.final_value ?? d.estimated_value ?? 0), 0)
@@ -137,7 +139,7 @@ function KanbanColumn({ stage, deals }: { stage: DealStage; deals: Deal[] }) {
       <div className="kanban-cards" ref={setNodeRef}>
         <SortableContext items={deals.map(d => d.id)} strategy={verticalListSortingStrategy}>
           {deals.map(deal => (
-            <DealCard key={deal.id} deal={deal} />
+            <DealCard key={deal.id} deal={deal} onCardClick={onCardClick} />
           ))}
         </SortableContext>
 
@@ -163,6 +165,7 @@ function KanbanColumn({ stage, deals }: { stage: DealStage; deals: Deal[] }) {
 export function PipelineBoard() {
   const [deals, setDeals] = useState<Deal[]>(MOCK_DEALS)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -201,6 +204,11 @@ export function PipelineBoard() {
     ))
   }
 
+  function handleUpdateDeal(updatedDeal: Deal) {
+    setDeals(prev => prev.map(d => d.id === updatedDeal.id ? updatedDeal : d))
+    setSelectedDeal(updatedDeal)
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -211,7 +219,12 @@ export function PipelineBoard() {
       <div className="pipeline-wrap">
         <div className="kanban-board">
           {stages.map(stage => (
-            <KanbanColumn key={stage} stage={stage} deals={dealsByStage[stage]} />
+            <KanbanColumn 
+              key={stage} 
+              stage={stage} 
+              deals={dealsByStage[stage]} 
+              onCardClick={setSelectedDeal}
+            />
           ))}
         </div>
       </div>
@@ -219,6 +232,12 @@ export function PipelineBoard() {
       <DragOverlay>
         {activeDeal && <DealCard deal={activeDeal} overlay />}
       </DragOverlay>
+
+      <DealDrawer
+        deal={selectedDeal}
+        onClose={() => setSelectedDeal(null)}
+        onUpdateDeal={handleUpdateDeal}
+      />
     </DndContext>
   )
 }
