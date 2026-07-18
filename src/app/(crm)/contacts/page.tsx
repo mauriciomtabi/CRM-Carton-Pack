@@ -62,7 +62,7 @@ export default function ContactsPage() {
   }
 
   return (
-    <div className="page-content animate-fade-in max-w-7xl mx-auto">
+    <div className="page-content animate-fade-in w-full h-full flex flex-col gap-6">
       {/* Topbar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>

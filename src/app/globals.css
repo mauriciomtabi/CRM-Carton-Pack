@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 /* ══════════════════════════════════════════
@@ -57,13 +57,11 @@
 /* ══════════════ RESET ══════════════ */
 *, *::before, *::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html, body {
   height: 100%;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Roboto', -apple-system, sans-serif;
   background: var(--black);
   color: var(--white);
   -webkit-font-smoothing: antialiased;
@@ -86,7 +84,7 @@ html, body {
 }
 
 /* ══════════════ TYPOGRAPHY ══════════════ */
-.font-display { font-family: 'Archivo Black', sans-serif; }
+.font-display { font-family: 'Roboto', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em; }
 .font-mono    { font-family: 'JetBrains Mono', monospace; }
 
 /* ══════════════ TRANSITIONS ══════════════ */
@@ -244,7 +242,7 @@ a, button, input, select, textarea {
 .sidebar-footer {
   margin-top: auto;
   border-top: 1px solid var(--line);
-  padding: 10px 0;
+  padding: 12px 0 28px 0; /* Prevents overlap with Next.js Turbopack dev badge */
 }
 
 /* ══════════════ MAIN ══════════════ */
@@ -645,19 +643,23 @@ a, button, input, select, textarea {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 22px;
+  padding: 24px;
   position: relative;
   overflow: hidden;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .stat-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
+  height: 2.5px;
   background: var(--stat-color, var(--lime));
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .stat-card:hover {
@@ -666,15 +668,17 @@ a, button, input, select, textarea {
 }
 
 .stat-value {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 28px;
-  line-height: 1;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
 .stat-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10.5px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
   color: var(--gray);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -682,15 +686,13 @@ a, button, input, select, textarea {
 }
 
 .stat-icon {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 /* ══════════════ FORM ELEMENTS ══════════════ */
