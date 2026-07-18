@@ -376,7 +376,7 @@ a, button, input, select, textarea {
   flex: 1;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 16px 20px 20px;
+  padding: 12px 0 20px 0;
 }
 
 .kanban-board {
@@ -392,7 +392,7 @@ a, button, input, select, textarea {
   max-width: 256px;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 136px);
+  height: 100%;
   border-radius: 12px;
   overflow: hidden;
   background: var(--charcoal);
