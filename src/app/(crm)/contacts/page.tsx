@@ -677,20 +677,20 @@ function NewContactModal({
       setCnpj(formatCnpj(clean))
       
       // Auto-populate expanded API information
-      const statusText = data.registration?.status?.description || 'ATIVA'
-      const statusDateFormatted = data.registration?.status?.date ? formatDateBr(data.registration?.status?.date) : ''
+      const statusText = data.status?.text || 'Ativa'
+      const statusDateFormatted = data.statusDate ? formatDateBr(data.statusDate) : ''
       setRegistrationStatus(statusDateFormatted ? `${statusText} desde ${statusDateFormatted}` : statusText)
       
       const mainCnaeId = data.mainActivity?.id
-      const mainCnaeDesc = data.mainActivity?.description
+      const mainCnaeDesc = data.mainActivity?.text
       setMainCnae(mainCnaeId ? `${mainCnaeId} - ${mainCnaeDesc || ''}` : '')
       
       // Format address from CNPJá structure
       const addrParts = []
       const addr = data.address
       if (addr) {
-        if (addr.streetType || addr.street) {
-          addrParts.push(`${addr.streetType || ''} ${addr.street || ''}`.trim())
+        if (addr.street) {
+          addrParts.push(addr.street)
         }
         if (addr.number) addrParts.push(addr.number)
         if (addr.district) addrParts.push(addr.district)
@@ -703,18 +703,22 @@ function NewContactModal({
         setAddress('')
       }
       
-      // Determine tax regime dynamically
-      if (data.simples?.mei) {
+      // Determine tax regime dynamically from simples/simei optant flags
+      if (data.company?.simei?.optant) {
         setTaxRegime('MEI')
-      } else if (data.simples?.simples) {
+      } else if (data.company?.simples?.optant) {
         setTaxRegime('Simples Nacional')
       } else {
         setTaxRegime('Lucro Presumido')
       }
 
-      setSpecialSituation(data.registration?.specialSituation || 'Nenhuma')
-      setSpecialSituationDate(data.registration?.specialSituationDate ? formatDateBr(data.registration?.specialSituationDate) : '-')
-      setStateRegistration(data.stateRegistration || '')
+      setSpecialSituation(data.specialSituation || 'Nenhuma')
+      setSpecialSituationDate(data.specialSituationDate ? formatDateBr(data.specialSituationDate) : '-')
+      
+      // Retrieve state registration (IE) from registrations array matching address state or first active
+      const ieObj = data.registrations?.find((r: any) => r.state === data.address?.state) || data.registrations?.find((r: any) => r.enabled) || data.registrations?.[0]
+      setStateRegistration(ieObj ? ieObj.number : '')
+      
       setName('') // Stay blank for manual physical person responsible name entry
     } catch (err) {
       setCnpjError('Erro ao buscar CNPJ. CNPJ inexistente ou API fora do ar.')
