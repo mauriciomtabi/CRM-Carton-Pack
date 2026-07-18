@@ -140,9 +140,11 @@ export default function UsersPage() {
   // Submit modal form
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim() || !email.trim()) return
+    if (!name.trim() || (role !== 'representante' && !email.trim())) return
 
-    const isCarton = email.toLowerCase().endsWith('@cartonpack.com')
+    const isCarton = role !== 'representante' && email.toLowerCase().endsWith('@cartonpack.com')
+    const finalUsername = isCarton ? undefined : (username || deriveUsername(name))
+    const finalEmail = role === 'representante' ? `${finalUsername || deriveUsername(name)}@representante.local` : email
 
     if (editingUser) {
       // Edit mode
@@ -151,11 +153,11 @@ export default function UsersPage() {
           ? { 
               ...u, 
               name, 
-              email, 
+              email: finalEmail, 
               role, 
               status, 
               phone, 
-              username: isCarton ? undefined : (username || deriveUsername(name)),
+              username: finalUsername,
               tempPassword: tempPassword || u.tempPassword
             }
           : u
@@ -164,13 +166,12 @@ export default function UsersPage() {
       setShowModal(false)
     } else {
       // Create mode
-      const finalUsername = isCarton ? undefined : (username || deriveUsername(name))
       const finalTempPassword = tempPassword || generateTempPassword()
 
       const newUser: TeamUser = {
         id: `u-${Date.now()}`,
         name,
-        email,
+        email: finalEmail,
         role,
         status,
         phone: formatPhoneBr(phone),
@@ -186,7 +187,7 @@ export default function UsersPage() {
       // Save credentials for the Copy Screen
       setCreatedUserCredentials({
         name,
-        usernameOrEmail: isCarton ? email : (finalUsername || email),
+        usernameOrEmail: isCarton ? finalEmail : (finalUsername || finalEmail),
         tempPassword: finalTempPassword,
         type: isCarton ? 'cartonpack' : 'externo'
       })
@@ -478,25 +479,42 @@ export default function UsersPage() {
                 </div>
               </div>
 
-              {/* Email */}
+              {/* Role (User Function) - Moved to top as requested */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">E-mail Comercial *</label>
-                <div className="relative">
-                  <Mail size={13} className="absolute left-3 top-3 text-[var(--gray)]" />
-                  <input
-                    type="email"
-                    required
-                    className="input w-full pl-9 font-mono text-xs"
-                    placeholder="Ex: roberto.carlos@cartonpack.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
+                <label className="text-[9px] font-bold text-[var(--lime)] uppercase font-mono tracking-wider">Função do Usuário *</label>
+                <select 
+                  className="input w-full font-bold"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as any)}
+                >
+                  <option value="vendedor">Vendedor</option>
+                  <option value="representante">Representante</option>
+                  <option value="admin">Administrador</option>
+                  <option value="financeiro">Financeiro</option>
+                </select>
               </div>
+
+              {/* Email (Hidden if Representative) */}
+              {role !== 'representante' && (
+                <div className="flex flex-col gap-1.5 animate-fade-in">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">E-mail Comercial *</label>
+                  <div className="relative">
+                    <Mail size={13} className="absolute left-3 top-3 text-[var(--gray)]" />
+                    <input
+                      type="email"
+                      required
+                      className="input w-full pl-9 font-mono text-xs"
+                      placeholder="Ex: roberto.carlos@cartonpack.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Conditional Username & Password Fields */}
               <div className="grid grid-cols-2 gap-4">
-                {!email.toLowerCase().endsWith('@cartonpack.com') ? (
+                {role === 'representante' || !email.toLowerCase().endsWith('@cartonpack.com') ? (
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[9px] font-bold text-[var(--lime)] uppercase font-mono tracking-wider">Nome de Usuário *</label>
                     <input
@@ -530,35 +548,18 @@ export default function UsersPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                {/* Phone */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">WhatsApp / Telefone</label>
-                  <div className="relative">
-                    <Phone size={13} className="absolute left-3 top-3 text-[var(--gray)]" />
-                    <input
-                      type="text"
-                      className="input w-full pl-9 font-mono text-xs"
-                      placeholder="(11) 98888-8888"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* Role */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Função do Usuário</label>
-                  <select 
-                    className="input w-full"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value as any)}
-                  >
-                    <option value="admin">Administrador</option>
-                    <option value="representante">Representante</option>
-                    <option value="vendedor">Vendedor</option>
-                    <option value="financeiro">Financeiro</option>
-                  </select>
+              {/* Phone */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">WhatsApp / Telefone</label>
+                <div className="relative">
+                  <Phone size={13} className="absolute left-3 top-3 text-[var(--gray)]" />
+                  <input
+                    type="text"
+                    className="input w-full pl-9 font-mono text-xs"
+                    placeholder="(11) 98888-8888"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
                 </div>
               </div>
 
