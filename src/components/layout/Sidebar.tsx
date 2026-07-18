@@ -72,7 +72,6 @@ export function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 py-3 overflow-y-auto">
         <div className="sidebar-section">
-          <div className="sidebar-section-label">Menu Principal</div>
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || pathname.startsWith(href + '/')
             return (
