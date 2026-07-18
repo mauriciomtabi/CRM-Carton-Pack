@@ -716,9 +716,29 @@ function NewContactModal({
       setSpecialSituationDate(data.specialSituationDate ? formatDateBr(data.specialSituationDate) : '-')
       
       // Retrieve state registration (IE) from registrations array matching address state or first active
-      const ieObj = data.registrations?.find((r: any) => r.state === data.address?.state) || data.registrations?.find((r: any) => r.enabled) || data.registrations?.[0]
-      setStateRegistration(ieObj ? ieObj.number : '')
+      let ieVal = ''
+      if (data.registrations && data.registrations.length > 0) {
+        const ieObj = data.registrations.find((r: any) => r.state === data.address?.state) || data.registrations.find((r: any) => r.enabled) || data.registrations[0]
+        ieVal = ieObj ? ieObj.number : ''
+      }
       
+      // Secondary fallback to CNPJ.ws for Inscrição Estadual if CNPJá returned empty
+      if (!ieVal) {
+        try {
+          const wsRes = await fetch(`https://publica.cnpj.ws/cnpj/${clean}`)
+          if (wsRes.ok) {
+            const wsData = await wsRes.json()
+            const ieObj = wsData.estabelecimento?.inscricoes_estadual?.find((ie: any) => ie.ativo) || wsData.estabelecimento?.inscricoes_estadual?.[0]
+            if (ieObj) {
+              ieVal = ieObj.inscricao_estadual || ''
+            }
+          }
+        } catch (e) {
+          // Fail silently and leave IE for manual input
+        }
+      }
+      
+      setStateRegistration(ieVal || '')
       setName('') // Stay blank for manual physical person responsible name entry
     } catch (err) {
       setCnpjError('Erro ao buscar CNPJ. CNPJ inexistente ou API fora do ar.')
