@@ -98,14 +98,11 @@ export default function DashboardPage() {
 
   return (
     <div className="page-content animate-fade-in w-full h-full flex flex-col gap-6">
-      {/* Header */}
-      <div>
-        <h1 className="font-display text-3xl text-[var(--white)] tracking-tight">
+      {/* Page Header */}
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <h1 className="font-display text-2xl md:text-3xl text-white font-bold tracking-tight">
           Dashboard
         </h1>
-        <p className="text-xs text-[var(--gray)] mt-1 uppercase tracking-wider font-medium">
-          Visão geral do pipeline comercial — Carton Pack
-        </p>
       </div>
 
       {/* Filter Row */}

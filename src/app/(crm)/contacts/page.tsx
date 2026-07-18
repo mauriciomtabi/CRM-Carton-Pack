@@ -63,16 +63,11 @@ export default function ContactsPage() {
 
   return (
     <div className="page-content animate-fade-in w-full h-full flex flex-col gap-6">
-      {/* Topbar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="font-display text-3xl text-[var(--white)] tracking-tight">
-            Carteira de Clientes
-          </h1>
-          <p className="text-xs text-[var(--gray)] mt-1 uppercase tracking-wider font-medium">
-            Gestão comercial e classificação de clientes ativos/inativos
-          </p>
-        </div>
+      {/* Page Header */}
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <h1 className="font-display text-2xl md:text-3xl text-white font-bold tracking-tight">
+          Carteira de Clientes
+        </h1>
 
         <button className="btn btn-primary self-start md:self-auto">
           <Plus size={14} />
