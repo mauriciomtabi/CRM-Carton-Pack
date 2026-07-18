@@ -946,7 +946,7 @@ function NewContactModal({
               </div>
 
               {/* Linha 2: CEP | Cidade | UF | ícone mapa */}
-              <div className="flex gap-3 items-end">
+              <div className="flex gap-3">
                 <div className="flex flex-col gap-1" style={{ width: '110px', flexShrink: 0 }}>
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CEP</label>
                   <input 
@@ -959,7 +959,7 @@ function NewContactModal({
                   />
                 </div>
 
-                <div className="flex flex-col gap-1" style={{ width: '160px', flexShrink: 0 }}>
+                <div className="flex flex-col gap-1 flex-1">
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Cidade</label>
                   <input 
                     type="text" 
@@ -970,7 +970,7 @@ function NewContactModal({
                   />
                 </div>
 
-                <div className="flex flex-col gap-1 flex-1">
+                <div className="flex flex-col gap-1" style={{ width: '88px', flexShrink: 0 }}>
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">UF</label>
                   <input 
                     type="text" 
@@ -982,74 +982,29 @@ function NewContactModal({
                   />
                 </div>
 
-                {/* Map icon — same height as inputs, self-end aligned */}
-                <a
-                  href={(address || city) ? `https://www.openstreetmap.org/search?query=${encodeURIComponent([address, bairro, city, state, cep].filter(Boolean).join(', '))}` : '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Ver endereço no mapa"
-                  className={`self-end flex items-center justify-center rounded-lg border transition-colors flex-shrink-0 ${(address || city) ? 'border-[var(--line)] text-[var(--gray)] hover:border-[var(--lime)] hover:text-[var(--lime)] cursor-pointer' : 'border-[var(--line)] text-[var(--gray2)] opacity-30 pointer-events-none'}`}
-                  style={{ width: '32px', height: '32px' }}
-                >
-                  <MapPin size={14} />
-                </a>
-              </div>
-            </div>
-
-            {/* Card 2: Atividade Principal */}
-            <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
-              <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Atividades Econômicas</h4>
-              <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CNAE Principal</label>
-                <input 
-                  type="text" 
-                  className="input text-xs py-1.5" 
-                  placeholder="CNAE e Descrição"
-                  value={mainCnae}
-                  onChange={(e) => setMainCnae(e.target.value)}
-                />
-              </div>
-
-              {/* Botão e lista de atividades secundárias */}
-              {sideActivities.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowSideActivities(v => !v)}
-                    className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider font-mono transition-colors w-fit"
-                    style={{ color: showSideActivities ? 'var(--lime)' : 'var(--gray)' }}
+                {/* Map icon — matches input field height exactly */}
+                <div className="flex flex-col gap-1" style={{ flexShrink: 0 }}>
+                  <label className="text-[9px] font-bold text-transparent uppercase font-mono tracking-wider select-none">·</label>
+                  <a
+                    href={(address || city) ? `https://www.openstreetmap.org/search?query=${encodeURIComponent([address, bairro, city, state, cep].filter(Boolean).join(', '))}` : '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Ver endereço no mapa"
+                    className={`input flex items-center justify-center px-2 transition-colors ${(address || city) ? 'text-[var(--gray)] hover:border-[var(--lime)] hover:text-[var(--lime)] cursor-pointer' : 'text-[var(--gray2)] opacity-30 pointer-events-none'}`}
+                    style={{ width: '36px' }}
                   >
-                    <span
-                      className="inline-block transition-transform duration-200"
-                      style={{ transform: showSideActivities ? 'rotate(90deg)' : 'rotate(0deg)' }}
-                    >▶</span>
-                    {showSideActivities ? 'Ocultar' : `Ver`} atividades secundárias ({sideActivities.length})
-                  </button>
-
-                  {showSideActivities && (
-                    <div className="flex flex-col gap-1 border border-[var(--line)] rounded-lg overflow-hidden">
-                      {sideActivities.map((act, i) => (
-                        <div
-                          key={act.id}
-                          className="flex gap-2 px-3 py-1.5 text-xs font-mono"
-                          style={{ background: i % 2 === 0 ? 'var(--card2)' : 'transparent' }}
-                        >
-                          <span className="text-[var(--lime)] font-bold shrink-0">{act.id}</span>
-                          <span className="text-[var(--gray)]">{act.text}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                    <MapPin size={14} />
+                  </a>
                 </div>
-              )}
+              </div>
             </div>
 
           </div>
 
-          {/* RIGHT COLUMN (1/3 width): Fisco, Tributário and Curve */}
+          {/* RIGHT COLUMN (1/3 width): Fisco e Tributário */}
           <div className="flex flex-col gap-4">
             
-            {/* Card 3: Regime Tributário */}
+            {/* Card 3: Regime Tributário (sem Curva ABC) */}
             <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
               <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Regime Tributário</h4>
               
@@ -1064,20 +1019,6 @@ function NewContactModal({
                   <option value="Simples Nacional">Simples Nacional</option>
                   <option value="Lucro Presumido">Lucro Presumido</option>
                   <option value="Lucro Real">Lucro Real</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Curva ABC</label>
-                <select 
-                  className="input text-xs py-1.5" 
-                  value={curve} 
-                  onChange={(e) => setCurve(e.target.value as any)}
-                >
-                  <option value="A">Curva A</option>
-                  <option value="B">Curva B</option>
-                  <option value="C">Curva C</option>
-                  <option value="D">Curva D</option>
                 </select>
               </div>
             </div>
@@ -1149,6 +1090,53 @@ function NewContactModal({
 
           </div>
 
+        </div>
+
+        {/* Atividades Econômicas — full width below the 2-col grid */}
+        <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
+          <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Atividades Econômicas</h4>
+          <div className="flex flex-col gap-1">
+            <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CNAE Principal</label>
+            <input 
+              type="text" 
+              className="input text-xs py-1.5" 
+              placeholder="CNAE e Descrição"
+              value={mainCnae}
+              onChange={(e) => setMainCnae(e.target.value)}
+            />
+          </div>
+
+          {sideActivities.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => setShowSideActivities(v => !v)}
+                className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider font-mono transition-colors w-fit"
+                style={{ color: showSideActivities ? 'var(--lime)' : 'var(--gray)' }}
+              >
+                <span
+                  className="inline-block transition-transform duration-200"
+                  style={{ transform: showSideActivities ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                >▶</span>
+                {showSideActivities ? 'Ocultar' : 'Ver'} atividades secundárias ({sideActivities.length})
+              </button>
+
+              {showSideActivities && (
+                <div className="flex flex-col gap-0 border border-[var(--line)] rounded-lg overflow-hidden">
+                  {sideActivities.map((act, i) => (
+                    <div
+                      key={act.id}
+                      className="flex gap-2 px-3 py-1.5 text-xs font-mono"
+                      style={{ background: i % 2 === 0 ? 'var(--card2)' : 'transparent' }}
+                    >
+                      <span className="text-[var(--lime)] font-bold shrink-0">{act.id}</span>
+                      <span className="text-[var(--gray)]">{act.text}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Footer Actions */}
