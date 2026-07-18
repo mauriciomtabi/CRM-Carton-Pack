@@ -784,26 +784,26 @@ function NewContactModal({
           {cnpjError && <span className="text-[10px] text-[var(--red)] font-semibold">{cnpjError}</span>}
         </div>
 
-        {/* Desktop 3-column Layout without scroll, mobile scrolls */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 border-t border-[var(--line)] pt-4 max-h-[68vh] overflow-y-auto lg:overflow-y-visible">
+        {/* Vertical stacked layout with a grid for responsive widths */}
+        <div className="flex flex-col gap-6 border-t border-[var(--line)] pt-4 max-h-[64vh] overflow-y-auto pr-2">
           
           {/* SEC 1: IDENTIFICAÇÃO */}
           <div className="flex flex-col gap-4">
             <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1">Dados Cadastrais</h4>
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1.5">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="col-span-1 md:col-span-4 flex flex-col gap-1.5">
                 <label className="label">Razão Social / Empresa *</label>
                 <input 
                   type="text" 
                   required
-                  className="input" 
+                  className="input font-bold" 
                   placeholder="Nome da Empresa"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                 />
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
                 <label className="label">Nome Fantasia</label>
                 <input 
                   type="text" 
@@ -814,7 +814,7 @@ function NewContactModal({
                 />
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
                 <label className="label">Responsável (Pessoa Física) *</label>
                 <input 
                   type="text" 
@@ -826,31 +826,29 @@ function NewContactModal({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">CNPJ</label>
-                  <input 
-                    type="text" 
-                    className="input font-mono" 
-                    placeholder="00.000.000/0001-00"
-                    value={cnpj}
-                    onChange={(e) => setCnpj(formatCnpj(e.target.value))}
-                  />
-                </div>
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+                <label className="label">CNPJ</label>
+                <input 
+                  type="text" 
+                  className="input font-mono" 
+                  placeholder="00.000.000/0001-00"
+                  value={cnpj}
+                  onChange={(e) => setCnpj(formatCnpj(e.target.value))}
+                />
+              </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Curva ABC</label>
-                  <select 
-                    className="input" 
-                    value={curve} 
-                    onChange={(e) => setCurve(e.target.value as any)}
-                  >
-                    <option value="A">Curva A</option>
-                    <option value="B">Curva B</option>
-                    <option value="C">Curva C</option>
-                    <option value="D">Curva D</option>
-                  </select>
-                </div>
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+                <label className="label">Curva ABC</label>
+                <select 
+                  className="input" 
+                  value={curve} 
+                  onChange={(e) => setCurve(e.target.value as any)}
+                >
+                  <option value="A">Curva A</option>
+                  <option value="B">Curva B</option>
+                  <option value="C">Curva C</option>
+                  <option value="D">Curva D</option>
+                </select>
               </div>
             </div>
           </div>
@@ -858,36 +856,34 @@ function NewContactModal({
           {/* SEC 2: FISCAL */}
           <div className="flex flex-col gap-4">
             <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1">Informações Fiscais</h4>
-            <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Situação Cadastral</label>
-                  <input 
-                    type="text" 
-                    className="input font-bold" 
-                    placeholder="Ex: ATIVA"
-                    style={{ color: registrationStatus.includes('ATIVA') ? 'var(--green)' : 'var(--white)' }}
-                    value={registrationStatus}
-                    onChange={(e) => setRegistrationStatus(e.target.value)}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Regime Tributário</label>
-                  <select 
-                    className="input" 
-                    value={taxRegime} 
-                    onChange={(e) => setTaxRegime(e.target.value as any)}
-                  >
-                    <option value="MEI">MEI</option>
-                    <option value="Simples Nacional">Simples Nacional</option>
-                    <option value="Lucro Presumido">Lucro Presumido</option>
-                    <option value="Lucro Real">Lucro Real</option>
-                  </select>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+                <label className="label">Situação Cadastral</label>
+                <input 
+                  type="text" 
+                  className="input font-bold" 
+                  placeholder="Ex: ATIVA"
+                  style={{ color: registrationStatus.includes('ATIVA') ? 'var(--green)' : 'var(--white)' }}
+                  value={registrationStatus}
+                  onChange={(e) => setRegistrationStatus(e.target.value)}
+                />
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+                <label className="label">Regime Tributário</label>
+                <select 
+                  className="input" 
+                  value={taxRegime} 
+                  onChange={(e) => setTaxRegime(e.target.value as any)}
+                >
+                  <option value="MEI">MEI</option>
+                  <option value="Simples Nacional">Simples Nacional</option>
+                  <option value="Lucro Presumido">Lucro Presumido</option>
+                  <option value="Lucro Real">Lucro Real</option>
+                </select>
+              </div>
+
+              <div className="col-span-1 md:col-span-4 flex flex-col gap-1.5">
                 <label className="label">Inscrição Estadual</label>
                 <input 
                   type="text" 
@@ -898,7 +894,7 @@ function NewContactModal({
                 />
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="col-span-1 md:col-span-4 flex flex-col gap-1.5">
                 <label className="label">CNAE Principal</label>
                 <input 
                   type="text" 
@@ -909,28 +905,26 @@ function NewContactModal({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Situação Especial</label>
-                  <input 
-                    type="text" 
-                    className="input" 
-                    placeholder="Nenhuma"
-                    value={specialSituation}
-                    onChange={(e) => setSpecialSituation(e.target.value)}
-                  />
-                </div>
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+                <label className="label">Situação Especial</label>
+                <input 
+                  type="text" 
+                  className="input" 
+                  placeholder="Nenhuma"
+                  value={specialSituation}
+                  onChange={(e) => setSpecialSituation(e.target.value)}
+                />
+              </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Data Situação Especial</label>
-                  <input 
-                    type="text" 
-                    className="input" 
-                    placeholder="-"
-                    value={specialSituationDate}
-                    onChange={(e) => setSpecialSituationDate(e.target.value)}
-                  />
-                </div>
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+                <label className="label">Data Situação Especial</label>
+                <input 
+                  type="text" 
+                  className="input" 
+                  placeholder="-"
+                  value={specialSituationDate}
+                  onChange={(e) => setSpecialSituationDate(e.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -938,32 +932,30 @@ function NewContactModal({
           {/* SEC 3: ENDEREÇO & CONTATO */}
           <div className="flex flex-col gap-4">
             <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1">Endereço e Contato</h4>
-            <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Telefone</label>
-                  <input 
-                    type="text" 
-                    className="input" 
-                    placeholder="(00) 00000-0000"
-                    value={phone}
-                    onChange={(e) => setPhone(formatPhoneBr(e.target.value))}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">E-mail</label>
-                  <input 
-                    type="email" 
-                    className="input" 
-                    placeholder="contato@empresa.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+                <label className="label">Telefone</label>
+                <input 
+                  type="text" 
+                  className="input" 
+                  placeholder="(00) 00000-0000"
+                  value={phone}
+                  onChange={(e) => setPhone(formatPhoneBr(e.target.value))}
+                />
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+                <label className="label">E-mail</label>
+                <input 
+                  type="email" 
+                  className="input" 
+                  placeholder="contato@empresa.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="col-span-1 md:col-span-4 flex flex-col gap-1.5">
                 <label className="label">Endereço de Correspondência</label>
                 <input 
                   type="text" 
@@ -974,29 +966,27 @@ function NewContactModal({
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <div className="col-span-2 flex flex-col gap-1.5">
-                  <label className="label">Cidade</label>
-                  <input 
-                    type="text" 
-                    className="input" 
-                    placeholder="Sapiranga"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                  />
-                </div>
+              <div className="col-span-1 md:col-span-3 flex flex-col gap-1.5">
+                <label className="label">Cidade</label>
+                <input 
+                  type="text" 
+                  className="input" 
+                  placeholder="Sapiranga"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                />
+              </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">UF</label>
-                  <input 
-                    type="text" 
-                    maxLength={2}
-                    className="input uppercase text-center font-bold font-mono" 
-                    placeholder="RS"
-                    value={state}
-                    onChange={(e) => setState(e.target.value.toUpperCase())}
-                  />
-                </div>
+              <div className="col-span-1 md:col-span-1 flex flex-col gap-1.5">
+                <label className="label">UF</label>
+                <input 
+                  type="text" 
+                  maxLength={2}
+                  className="input uppercase text-center font-bold font-mono" 
+                  placeholder="RS"
+                  value={state}
+                  onChange={(e) => setState(e.target.value.toUpperCase())}
+                />
               </div>
             </div>
           </div>
