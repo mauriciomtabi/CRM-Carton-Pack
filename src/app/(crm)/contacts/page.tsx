@@ -41,6 +41,8 @@ interface MockContact {
   registrationStatus?: string
   mainCnae?: string
   address?: string
+  bairro?: string
+  cep?: string
   taxRegime?: 'MEI' | 'Simples Nacional' | 'Lucro Presumido' | 'Lucro Real'
   specialSituation?: string
   specialSituationDate?: string
@@ -656,6 +658,8 @@ function NewContactModal({
   const [registrationStatus, setRegistrationStatus] = useState('ATIVA')
   const [mainCnae, setMainCnae] = useState('')
   const [address, setAddress] = useState('')
+  const [bairro, setBairro] = useState('')
+  const [cep, setCep] = useState('')
   const [taxRegime, setTaxRegime] = useState<'MEI' | 'Simples Nacional' | 'Lucro Presumido' | 'Lucro Real'>('Simples Nacional')
   const [specialSituation, setSpecialSituation] = useState('Nenhuma')
   const [specialSituationDate, setSpecialSituationDate] = useState('-')
@@ -699,22 +703,18 @@ function NewContactModal({
       const mainCnaeDesc = data.mainActivity?.text
       setMainCnae(mainCnaeId ? `${mainCnaeId} - ${mainCnaeDesc || ''}` : '')
       
-      // Format address from CNPJá structure
-      const addrParts = []
+      // Populate address fields separately from CNPJá structure
       const addr = data.address
       if (addr) {
-        if (addr.street) {
-          addrParts.push(addr.street)
-        }
-        if (addr.number) addrParts.push(addr.number)
-        if (addr.district) addrParts.push(addr.district)
-        if (addr.zip) {
-          const formattedCep = addr.zip.replace(/^(\d{5})(\d{3})/, '$1-$2')
-          addrParts.push(`CEP: ${formattedCep}`)
-        }
-        setAddress(addrParts.join(', '))
+        const streetParts = [addr.street, addr.number].filter(Boolean)
+        setAddress(streetParts.join(', '))
+        setBairro(addr.district || '')
+        const rawZip = addr.zip || ''
+        setCep(rawZip ? rawZip.replace(/^(\d{5})(\d{3})/, '$1-$2') : '')
       } else {
         setAddress('')
+        setBairro('')
+        setCep('')
       }
       
       // Determine tax regime dynamically from simples/simei optant flags
@@ -784,6 +784,8 @@ function NewContactModal({
       registrationStatus,
       mainCnae,
       address,
+      bairro,
+      cep,
       taxRegime,
       specialSituation,
       specialSituationDate,
@@ -909,19 +911,45 @@ function NewContactModal({
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-3">
-                <div className="col-span-2 flex flex-col gap-1">
-                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Endereço de Correspondência</label>
+              {/* Linha 1: Rua + Número | Bairro */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Rua / Número</label>
                   <input 
                     type="text" 
                     className="input text-xs py-1.5" 
-                    placeholder="Rua, Número, Bairro"
+                    placeholder="Rua, Número"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                   />
                 </div>
-
                 <div className="flex flex-col gap-1">
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Bairro</label>
+                  <input 
+                    type="text" 
+                    className="input text-xs py-1.5" 
+                    placeholder="Bairro"
+                    value={bairro}
+                    onChange={(e) => setBairro(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Linha 2: CEP | Cidade | UF (pequeno) | ícone mapa */}
+              <div className="flex gap-3 items-end">
+                <div className="flex flex-col gap-1" style={{ width: '120px', flexShrink: 0 }}>
+                  <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CEP</label>
+                  <input 
+                    type="text" 
+                    maxLength={9}
+                    className="input text-xs py-1.5 font-mono" 
+                    placeholder="00000-000"
+                    value={cep}
+                    onChange={(e) => setCep(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1 flex-1">
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Cidade</label>
                   <input 
                     type="text" 
@@ -932,30 +960,29 @@ function NewContactModal({
                   />
                 </div>
 
-                {/* UF + Map icon grouped */}
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1" style={{ width: '56px', flexShrink: 0 }}>
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">UF</label>
-                  <div className="flex gap-1.5">
-                    <input 
-                      type="text" 
-                      maxLength={2}
-                      className="input text-xs py-1.5 uppercase text-center font-bold font-mono"
-                      style={{ width: '52px', flexShrink: 0 }}
-                      placeholder="UF"
-                      value={state}
-                      onChange={(e) => setState(e.target.value.toUpperCase())}
-                    />
-                    <a
-                      href={(address || city) ? `https://www.openstreetmap.org/search?query=${encodeURIComponent([address, city, state].filter(Boolean).join(', '))}` : '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title="Ver endereço no mapa"
-                      className={`flex-1 flex items-center justify-center rounded-lg border transition-colors ${(address || city) ? 'border-[var(--line)] text-[var(--gray)] hover:border-[var(--lime)] hover:text-[var(--lime)] cursor-pointer' : 'border-[var(--line)] text-[var(--gray2)] opacity-30 pointer-events-none'}`}
-                    >
-                      <MapPin size={13} />
-                    </a>
-                  </div>
+                  <input 
+                    type="text" 
+                    maxLength={2}
+                    className="input text-xs py-1.5 uppercase text-center font-bold font-mono w-full"
+                    placeholder="UF"
+                    value={state}
+                    onChange={(e) => setState(e.target.value.toUpperCase())}
+                  />
                 </div>
+
+                {/* Map icon — icon size only */}
+                <a
+                  href={(address || city) ? `https://www.openstreetmap.org/search?query=${encodeURIComponent([address, bairro, city, state, cep].filter(Boolean).join(', '))}` : '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Ver endereço no mapa"
+                  style={{ marginBottom: '1px' }}
+                  className={`flex items-center justify-center rounded-lg border p-2 transition-colors ${(address || city) ? 'border-[var(--line)] text-[var(--gray)] hover:border-[var(--lime)] hover:text-[var(--lime)] cursor-pointer' : 'border-[var(--line)] text-[var(--gray2)] opacity-30 pointer-events-none'}`}
+                >
+                  <MapPin size={14} />
+                </a>
               </div>
             </div>
 
