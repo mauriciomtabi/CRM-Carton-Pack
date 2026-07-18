@@ -485,12 +485,11 @@ a, button, input, select, textarea {
 .kanban-col:hover .kanban-col-icon {
   background: color-mix(in srgb, var(--col-color) 12%, transparent);
   border-color: color-mix(in srgb, var(--col-color) 25%, transparent);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--col-color) 20%, transparent);
 }
 
 .kanban-col:hover .kanban-col-icon svg {
-  fill-opacity: 0.22;
-  transform: scale(1.05);
+  fill-opacity: 0.15;
+  transform: scale(1.12);
 }
 
 .kanban-col-info { flex: 1; min-width: 0; }
@@ -770,9 +769,9 @@ a, button, input, select, textarea {
 }
 
 .stat-card:hover .stat-icon svg {
-  fill-opacity: 0.22;
+  fill-opacity: 0.15;
   transform: scale(1.12);
-  filter: drop-shadow(0 0 10px var(--stat-color)) drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+  filter: none;
 }
 
 /* ══════════════ SECTION HEADER ICONS ══════════════ */
@@ -797,9 +796,9 @@ a, button, input, select, textarea {
 }
 
 .card:hover .section-header-icon svg {
-  fill-opacity: 0.22;
+  fill-opacity: 0.15;
   transform: scale(1.12);
-  filter: drop-shadow(0 0 10px var(--lime)) drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+  filter: none;
 }
 
 
