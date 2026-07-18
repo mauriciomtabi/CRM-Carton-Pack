@@ -418,13 +418,18 @@ export default function UsersPage() {
                         </button>
                         
                         <button
+                          type="button"
                           onClick={() => handleToggleStatus(user)}
                           title={user.status === 'ativo' ? 'Suspender Acesso' : 'Reativar Acesso'}
-                          className={`btn p-2 rounded-lg transition-colors border-none bg-transparent ${
-                            user.status === 'ativo' ? 'text-amber-500 hover:text-amber-300' : 'text-emerald-500 hover:text-emerald-300'
+                          className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none self-center mx-1.5 ${
+                            user.status === 'ativo' ? 'bg-[var(--lime)]' : 'bg-zinc-700'
                           }`}
                         >
-                          {user.status === 'ativo' ? <UserX size={13} /> : <UserCheck size={13} />}
+                          <span
+                            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                              user.status === 'ativo' ? 'translate-x-4' : 'translate-x-0'
+                            }`}
+                          />
                         </button>
 
                         <button
@@ -585,34 +590,25 @@ export default function UsersPage() {
               {editingUser && (
                 <div className="flex flex-col gap-1.5 animate-fade-in">
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Status Cadastral</label>
-                  <div className="flex gap-4 p-3 border border-[var(--line)] rounded-xl bg-[var(--card)]">
-                    <label className="flex items-center gap-2 text-xs text-[var(--white)] cursor-pointer select-none">
-                      <input
-                        type="radio"
-                        name="modal-status"
-                        checked={status === 'ativo'}
-                        onChange={() => setStatus('ativo')}
-                        className="accent-[var(--lime)]"
-                      />
-                      <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--green)] inline-block"></span>
-                        Ativo (Acesso autorizado)
-                      </span>
-                    </label>
+                  <div className="flex items-center justify-between p-3.5 border border-[var(--line)] rounded-xl bg-[var(--card)]">
+                    <span className="text-xs text-[var(--white)] font-medium flex items-center gap-1.5">
+                      <span className={`w-1.5 h-1.5 rounded-full ${status === 'ativo' ? 'bg-[var(--green)]' : 'bg-[var(--red)]'}`}></span>
+                      {status === 'ativo' ? 'Acesso Ativo (Autorizado)' : 'Acesso Inativo (Suspenso)'}
+                    </span>
                     
-                    <label className="flex items-center gap-2 text-xs text-[var(--white)] cursor-pointer select-none">
-                      <input
-                        type="radio"
-                        name="modal-status"
-                        checked={status === 'inativo'}
-                        onChange={() => setStatus('inativo')}
-                        className="accent-[var(--lime)]"
+                    <button
+                      type="button"
+                      onClick={() => setStatus(status === 'ativo' ? 'inativo' : 'ativo')}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        status === 'ativo' ? 'bg-[var(--lime)]' : 'bg-zinc-700'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                          status === 'ativo' ? 'translate-x-5' : 'translate-x-0'
+                        }`}
                       />
-                      <span className="flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[var(--red)] inline-block"></span>
-                        Inativo (Suspenso)
-                      </span>
-                    </label>
+                    </button>
                   </div>
                 </div>
               )}
