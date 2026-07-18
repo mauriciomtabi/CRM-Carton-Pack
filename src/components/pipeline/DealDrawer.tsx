@@ -201,9 +201,9 @@ export function DealDrawer({ deal, onClose, onUpdateDeal }: DealDrawerProps) {
             }}>
               {STAGE_CONFIG[stage].label}
             </span>
-            <h2 className="font-display text-lg text-white mt-1.5">{title}</h2>
+            <h2 className="font-display text-lg text-[var(--white)] mt-1.5">{title}</h2>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white p-1 rounded-md hover:bg-[var(--line)] transition-colors">
+          <button onClick={onClose} className="text-gray-400 hover:text-[var(--white)] p-1 rounded-md hover:bg-[var(--line)] transition-colors">
             <X size={18} />
           </button>
         </div>
@@ -396,7 +396,7 @@ export function DealDrawer({ deal, onClose, onUpdateDeal }: DealDrawerProps) {
                         className={`text-[10px] font-bold px-2.5 py-1 rounded transition-colors uppercase ${
                           activityType === type
                             ? 'bg-neutral-800 text-[var(--lime)] border border-[rgba(180,217,50,0.2)]'
-                            : 'text-[var(--gray)] hover:text-white bg-transparent'
+                            : 'text-[var(--gray)] hover:text-[var(--white)] bg-transparent'
                         }`}
                       >
                         {type}
