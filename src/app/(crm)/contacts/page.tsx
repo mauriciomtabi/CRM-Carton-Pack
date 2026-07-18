@@ -658,39 +658,63 @@ function NewContactModal({
     setCnpjError('')
 
     try {
-      const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${clean}`)
+      const res = await fetch(`https://open.cnpja.com/office/${clean}`)
       if (!res.ok) throw new Error('Não encontrado')
       const data = await res.json()
 
-      // Populating standard and expanded fields
-      setCompany(data.razao_social || '')
-      setTradeName(data.nome_fantasia || data.razao_social || '')
-      setPhone(formatPhoneBr(data.ddd_telefone_1 || ''))
-      setEmail(data.email || '')
-      setCity(data.municipio ? capitalizeString(data.municipio) : '')
-      setState(data.uf || '')
+      // Populating standard and expanded fields from CNPJá API
+      const compName = data.company?.name || ''
+      setCompany(compName)
+      setTradeName(data.alias || compName)
+      
+      const phoneObj = data.phones?.[0]
+      const rawPhone = phoneObj ? `${phoneObj.area}${phoneObj.number}` : ''
+      setPhone(formatPhoneBr(rawPhone))
+      
+      setEmail(data.emails?.[0]?.address || '')
+      setCity(data.address?.city || '')
+      setState(data.address?.state || '')
       setCnpj(formatCnpj(clean))
       
       // Auto-populate expanded API information
-      const statusText = data.descricao_situacao_cadastral || 'ATIVA'
-      const statusDateFormatted = data.data_situacao_cadastral ? formatDateBr(data.data_situacao_cadastral) : ''
+      const statusText = data.registration?.status?.description || 'ATIVA'
+      const statusDateFormatted = data.registration?.status?.date ? formatDateBr(data.registration?.status?.date) : ''
       setRegistrationStatus(statusDateFormatted ? `${statusText} desde ${statusDateFormatted}` : statusText)
       
-      setMainCnae(data.cnae_fiscal ? `${data.cnae_fiscal} - ${data.cnae_fiscal_descricao || ''}` : '')
-      setAddress(buildAddress(data))
+      const mainCnaeId = data.mainActivity?.id
+      const mainCnaeDesc = data.mainActivity?.description
+      setMainCnae(mainCnaeId ? `${mainCnaeId} - ${mainCnaeDesc || ''}` : '')
+      
+      // Format address from CNPJá structure
+      const addrParts = []
+      const addr = data.address
+      if (addr) {
+        if (addr.streetType || addr.street) {
+          addrParts.push(`${addr.streetType || ''} ${addr.street || ''}`.trim())
+        }
+        if (addr.number) addrParts.push(addr.number)
+        if (addr.district) addrParts.push(addr.district)
+        if (addr.zip) {
+          const formattedCep = addr.zip.replace(/^(\d{5})(\d{3})/, '$1-$2')
+          addrParts.push(`CEP: ${formattedCep}`)
+        }
+        setAddress(addrParts.join(', '))
+      } else {
+        setAddress('')
+      }
       
       // Determine tax regime dynamically
-      if (data.opcao_pelo_mei) {
+      if (data.simples?.mei) {
         setTaxRegime('MEI')
-      } else if (data.opcao_pelo_simples) {
+      } else if (data.simples?.simples) {
         setTaxRegime('Simples Nacional')
       } else {
         setTaxRegime('Lucro Presumido')
       }
 
-      setSpecialSituation(data.situacao_especial || 'Nenhuma')
-      setSpecialSituationDate(data.data_situacao_especial ? formatDateBr(data.data_situacao_especial) : '-')
-      setStateRegistration('') // Inscrição Estadual stays empty since it is state-level (SEFAZ)
+      setSpecialSituation(data.registration?.specialSituation || 'Nenhuma')
+      setSpecialSituationDate(data.registration?.specialSituationDate ? formatDateBr(data.registration?.specialSituationDate) : '-')
+      setStateRegistration(data.stateRegistration || '')
       setName('') // Stay blank for manual physical person responsible name entry
     } catch (err) {
       setCnpjError('Erro ao buscar CNPJ. CNPJ inexistente ou API fora do ar.')
