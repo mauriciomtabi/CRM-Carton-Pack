@@ -13,12 +13,14 @@ import {
   LogOut,
   Sun,
   Moon,
+  UserCog,
 } from 'lucide-react'
 
 const navItems = [
   { href: '/dashboard',  label: 'Dashboard',   icon: LayoutDashboard },
   { href: '/pipeline',   label: 'Pipeline',     icon: KanbanSquare },
   { href: '/contacts',   label: 'Contatos',     icon: Users },
+  { href: '/users',      label: 'Usuários',     icon: UserCog },
   { href: '/briefings',  label: 'Orçamentos',   icon: FileText },
   { href: '/reports',    label: 'Relatórios',   icon: BarChart3 },
   { href: '/settings',   label: 'Configurações',icon: Settings },

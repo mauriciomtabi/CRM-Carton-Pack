@@ -1364,6 +1364,65 @@ export default function ContactsPage() {
   const [selectedContact, setSelectedContact] = useState<MockContact | null>(null)
   const [showNewContactModal, setShowNewContactModal] = useState(false)
 
+  // Dynamic representatives list from CRM Users in localStorage + default ones
+  const [representativesList, setRepresentativesList] = useState<string[]>(['Ana Lima', 'Ermínio', 'Carlos Mendes'])
+
+  // Load contacts and representatives on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedContacts = localStorage.getItem('crm_contacts')
+      if (savedContacts) {
+        try {
+          setContacts(JSON.parse(savedContacts))
+        } catch (e) {
+          console.error(e)
+        }
+      }
+
+      const savedUsers = localStorage.getItem('crm_users')
+      if (savedUsers) {
+        try {
+          const parsed = JSON.parse(savedUsers)
+          const repsFromUsers = parsed
+            .filter((u: any) => u.role === 'representante' && u.status === 'ativo')
+            .map((u: any) => u.name)
+          if (repsFromUsers.length > 0) {
+            setRepresentativesList(repsFromUsers)
+          }
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    }
+  }, [])
+
+  // Persist contacts on change
+  const saveContacts = (newContacts: MockContact[]) => {
+    setContacts(newContacts)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('crm_contacts', JSON.stringify(newContacts))
+    }
+  }
+
+  // Update representatives list when contacts change to include any custom reps in existing contacts
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedUsers = localStorage.getItem('crm_users')
+      let repsFromUsers: string[] = []
+      if (savedUsers) {
+        try {
+          const parsed = JSON.parse(savedUsers)
+          repsFromUsers = parsed
+            .filter((u: any) => u.role === 'representante' && u.status === 'ativo')
+            .map((u: any) => u.name)
+        } catch (e) {}
+      }
+      const repsFromContacts = Array.from(new Set(contacts.map(c => c.representative)))
+      const combined = Array.from(new Set([...repsFromUsers, ...repsFromContacts, 'Ana Lima', 'Ermínio', 'Carlos Mendes']))
+      setRepresentativesList(combined)
+    }
+  }, [contacts])
+
   // Filtering logic
   const filteredContacts = contacts.filter(contact => {
     const matchesSearch = 
@@ -1378,8 +1437,6 @@ export default function ContactsPage() {
     return matchesSearch && matchesCurve && matchesRep && matchesStatus
   })
 
-  const representatives = Array.from(new Set(contacts.map(c => c.representative)))
-
   function openMap(e: React.MouseEvent, contact: MockContact) {
     e.stopPropagation()
     const query = [contact.address, contact.bairro, contact.city, contact.state, contact.cep].filter(Boolean).join(', ')
@@ -1389,7 +1446,8 @@ export default function ContactsPage() {
   }
 
   const handleUpdateContact = (updatedContact: MockContact) => {
-    setContacts(prev => prev.map(c => c.id === updatedContact.id ? updatedContact : c))
+    const updated = contacts.map(c => c.id === updatedContact.id ? updatedContact : c)
+    saveContacts(updated)
     setSelectedContact(updatedContact)
   }
 
@@ -1400,7 +1458,7 @@ export default function ContactsPage() {
       company: data.company || '',
       cnpj: data.cnpj || '',
       curve: data.curve || 'C',
-      representative: data.representative || 'Ana Lima',
+      representative: data.representative || (representativesList[0] || 'Ana Lima'),
       phone: data.phone || '',
       email: data.email || '',
       city: data.city || '',
@@ -1422,7 +1480,8 @@ export default function ContactsPage() {
       stateRegistration: data.stateRegistration || ''
     }
 
-    setContacts(prev => [newContact, ...prev])
+    const updated = [newContact, ...contacts]
+    saveContacts(updated)
     setShowNewContactModal(false)
   }
 
@@ -1476,7 +1535,7 @@ export default function ContactsPage() {
             onChange={(e) => setSelectedRep(e.target.value)}
           >
             <option value="all">Todos os Representantes</option>
-            {representatives.map(rep => (
+            {representativesList.map(rep => (
               <option key={rep} value={rep}>{rep}</option>
             ))}
           </select>
@@ -1620,7 +1679,7 @@ export default function ContactsPage() {
         contact={selectedContact}
         onClose={() => setSelectedContact(null)}
         onUpdateContact={handleUpdateContact}
-        representatives={representatives}
+        representatives={representativesList}
       />
 
       {/* New Contact Modal with CNPJ Autopopulate */}
