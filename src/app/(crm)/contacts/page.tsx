@@ -18,7 +18,8 @@ import {
   MessageSquare,
   ShieldCheck,
   Percent,
-  FileSpreadsheet
+  FileSpreadsheet,
+  ExternalLink
 } from 'lucide-react'
 import { whatsappLink, formatCurrency } from '@/lib/utils'
 
@@ -385,7 +386,21 @@ function ContactDrawer({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1.5">
-                      <label className="label">Inscrição Estadual</label>
+                      <div className="flex items-center justify-between">
+                        <label className="label">Inscrição Estadual</label>
+                        {cnpj && (
+                          <a
+                            href={`https://cnpja.com/office/${cnpj.replace(/\D/g, '')}?tab=registrations`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Consultar Inscrições Estaduais no CNPJá"
+                            className="flex items-center gap-1 text-[9px] font-bold text-[var(--lime)] hover:text-white uppercase tracking-wider font-mono transition-colors"
+                          >
+                            <span>Ver IE no CNPJá</span>
+                            <ExternalLink size={9} />
+                          </a>
+                        )}
+                      </div>
                       <input 
                         type="text" 
                         className="input font-mono" 
@@ -981,7 +996,20 @@ function NewContactModal({
 
             {/* Card 4: Fisco e Inscrições */}
             <div className="card p-4 border-[var(--line)] bg-[var(--card)] flex flex-col gap-3">
-              <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1 font-mono">Inscrições Estaduais e Status</h4>
+              <div className="flex justify-between items-center border-b border-[var(--line)] pb-1">
+                <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] font-mono">Inscrições Estaduais e Status</h4>
+                {cnpj && (
+                  <a 
+                    href={`https://cnpja.com/office/${cnpj.replace(/\D/g, '')}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-[9px] font-bold text-[var(--lime)] hover:text-white uppercase tracking-wider font-mono flex items-center gap-1 transition-colors"
+                  >
+                    <span>Ver no CNPJá</span>
+                    <ExternalLink size={10} />
+                  </a>
+                )}
+              </div>
               
               <div className="flex flex-col gap-1">
                 <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">Situação Cadastral</label>
