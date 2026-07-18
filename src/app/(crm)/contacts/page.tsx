@@ -35,7 +35,7 @@ interface MockContact {
   state: string
   status: 'ativo' | 'inativo'
   email?: string
-  // New Fields
+  // Expanded fields
   tradeName?: string
   registrationStatus?: string
   mainCnae?: string
@@ -43,6 +43,7 @@ interface MockContact {
   taxRegime?: 'MEI' | 'Simples Nacional' | 'Lucro Presumido' | 'Lucro Real'
   specialSituation?: string
   specialSituationDate?: string
+  stateRegistration?: string // Inscrição Estadual
 }
 
 interface Activity {
@@ -53,19 +54,37 @@ interface Activity {
 }
 
 const MOCK_CONTACTS: MockContact[] = [
-  { id: '1', name: 'Alvaro Ferreira', company: 'Gota Limpa Indústria', cnpj: '12.345.678/0001-90', curve: 'A', representative: 'Ermínio', lastPurchaseDays: 95, phone: '51999999999', city: 'Sapiranga', state: 'RS', status: 'inativo', email: 'alvaro@gotalimpa.com', tradeName: 'Gota Limpa', registrationStatus: 'ATIVA', mainCnae: '2061-6/00 - Fabricação de sabões e detergentes sintéticos', address: 'Av. Industrial, 4500 - Bairro Industrial - CEP: 93800-000 - Sapiranga/RS', taxRegime: 'Simples Nacional', specialSituation: 'Nenhuma', specialSituationDate: '-' },
-  { id: '2', name: 'Ana Lima', company: 'Natura Cosméticos', cnpj: '98.765.432/0001-10', curve: 'A', representative: 'Ana Lima', lastPurchaseDays: 15, phone: '11988888888', city: 'São Paulo', state: 'SP', status: 'ativo', email: 'compras@natura.com.br', tradeName: 'Natura', registrationStatus: 'ATIVA', mainCnae: '2063-3/00 - Fabricação de cosméticos, produtos de perfumaria e de higiene pessoal', address: 'Av. Alexandre Colares, 1188 - Parque Anhanguera - CEP: 05106-000 - São Paulo/SP', taxRegime: 'Lucro Real', specialSituation: 'Nenhuma', specialSituationDate: '-' },
-  { id: '3', name: 'Carlos Mendes', company: 'XP Presentes', cnpj: '11.222.333/0001-44', curve: 'B', representative: 'Carlos Mendes', lastPurchaseDays: 30, phone: '21977777777', city: 'Rio de Janeiro', state: 'RJ', status: 'ativo', email: 'carlos@xppresentes.com', tradeName: 'XP Presentes', registrationStatus: 'ATIVA', mainCnae: '4789-0/01 - Comércio varejista de suvenires, bijuterias e artesanatos', address: 'Av. Rio Branco, 156 - Centro - CEP: 20040-003 - Rio de Janeiro/RJ', taxRegime: 'Simples Nacional', specialSituation: 'Nenhuma', specialSituationDate: '-' },
+  { id: '1', name: 'Alvaro Ferreira', company: 'Gota Limpa Indústria', cnpj: '12.345.678/0001-90', curve: 'A', representative: 'Ermínio', lastPurchaseDays: 95, phone: '(51) 99999-9999', city: 'Sapiranga', state: 'RS', status: 'inativo', email: 'alvaro@gotalimpa.com', tradeName: 'Gota Limpa', registrationStatus: 'ATIVA desde 30/03/2006', mainCnae: '2061-6/00 - Fabricação de sabões e detergentes sintéticos', address: 'Av. Industrial, 4500 - Bairro Industrial - CEP: 93800-000 - Sapiranga/RS', taxRegime: 'Simples Nacional', specialSituation: 'Nenhuma', specialSituationDate: '-', stateRegistration: '112/0034455' },
+  { id: '2', name: 'Ana Lima', company: 'Natura Cosméticos', cnpj: '98.765.432/0001-10', curve: 'A', representative: 'Ana Lima', lastPurchaseDays: 15, phone: '(11) 98888-8888', city: 'São Paulo', state: 'SP', status: 'ativo', email: 'compras@natura.com.br', tradeName: 'Natura', registrationStatus: 'ATIVA desde 15/10/1990', mainCnae: '2063-3/00 - Fabricação de cosméticos, produtos de perfumaria e de higiene pessoal', address: 'Av. Alexandre Colares, 1188 - Parque Anhanguera - CEP: 05106-000 - São Paulo/SP', taxRegime: 'Lucro Real', specialSituation: 'Nenhuma', specialSituationDate: '-', stateRegistration: '108/9988776' },
+  { id: '3', name: 'Carlos Mendes', company: 'XP Presentes', cnpj: '11.222.333/0001-44', curve: 'B', representative: 'Carlos Mendes', lastPurchaseDays: 30, phone: '(21) 97777-7777', city: 'Rio de Janeiro', state: 'RJ', status: 'ativo', email: 'carlos@xppresentes.com', tradeName: 'XP Presentes', registrationStatus: 'ATIVA desde 02/07/2015', mainCnae: '4789-0/01 - Comércio varejista de suvenires, bijuterias e artesanatos', address: 'Av. Rio Branco, 156 - Centro - CEP: 20040-003 - Rio de Janeiro/RJ', taxRegime: 'Simples Nacional', specialSituation: 'Nenhuma', specialSituationDate: '-', stateRegistration: '205/6677889' },
 ]
 
 function formatCnpj(v: string) {
-  v = v.replace(/\D/g, '')
-  if (v.length > 14) v = v.substring(0, 14)
-  if (v.length <= 2) return v
-  if (v.length <= 5) return v.replace(/^(\d{2})(\d)/, '$1.$2')
-  if (v.length <= 8) return v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-  if (v.length <= 12) return v.replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3/$4')
-  return v.replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, '$1.$2.$3/$4-$5')
+  const d = v.replace(/\D/g, '')
+  if (d.length <= 2) return d
+  if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`
+  if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`
+  if (d.length <= 12) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`
+  return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12, 14)}`
+}
+
+function formatPhoneBr(v: string) {
+  const d = v.replace(/\D/g, '')
+  if (d.length <= 2) return d
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7, 11)}`
+}
+
+function formatDateBr(isoDateStr: string | null | undefined) {
+  if (!isoDateStr || isoDateStr === '-' || isoDateStr === 'Nenhuma') return '-'
+  const clean = isoDateStr.split('T')[0] // remove time if any
+  const parts = clean.split('-')
+  if (parts.length === 3) {
+    const [year, month, day] = parts
+    return `${day}/${month}/${year}`
+  }
+  return isoDateStr
 }
 
 function capitalizeString(str: string) {
@@ -122,6 +141,7 @@ function ContactDrawer({
   const [taxRegime, setTaxRegime] = useState<'MEI' | 'Simples Nacional' | 'Lucro Presumido' | 'Lucro Real'>('Simples Nacional')
   const [specialSituation, setSpecialSituation] = useState('')
   const [specialSituationDate, setSpecialSituationDate] = useState('')
+  const [stateRegistration, setStateRegistration] = useState('')
 
   // History states
   const [activities, setActivities] = useState<Activity[]>([])
@@ -148,6 +168,7 @@ function ContactDrawer({
       setTaxRegime(contact.taxRegime ?? 'Simples Nacional')
       setSpecialSituation(contact.specialSituation ?? 'Nenhuma')
       setSpecialSituationDate(contact.specialSituationDate ?? '-')
+      setStateRegistration(contact.stateRegistration ?? '')
 
       setActivities([
         { id: '1', type: 'nota', content: 'Ficha cadastral criada no CRM Carton Pack.', timestamp: '10/07/2026 09:00' },
@@ -179,7 +200,8 @@ function ContactDrawer({
       address,
       taxRegime,
       specialSituation,
-      specialSituationDate
+      specialSituationDate,
+      stateRegistration
     })
   }
 
@@ -334,7 +356,7 @@ function ContactDrawer({
                         <input 
                           type="text" 
                           className="input font-bold" 
-                          style={{ color: registrationStatus === 'ATIVA' ? 'var(--green)' : 'var(--red)' }}
+                          style={{ color: registrationStatus.includes('ATIVA') ? 'var(--green)' : 'var(--white)' }}
                           value={registrationStatus} 
                           onChange={(e) => setRegistrationStatus(e.target.value)}
                           onBlur={handleSaveGeneral}
@@ -358,6 +380,35 @@ function ContactDrawer({
                           <option value="Lucro Real">Lucro Real</option>
                         </select>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Inscrição Estadual</label>
+                      <input 
+                        type="text" 
+                        className="input font-mono" 
+                        placeholder="Insira a IE manualmente"
+                        value={stateRegistration} 
+                        onChange={(e) => setStateRegistration(e.target.value)}
+                        onBlur={handleSaveGeneral}
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="label">Curva ABC</label>
+                      <select 
+                        className="input" 
+                        value={curve} 
+                        onChange={(e) => setCurve(e.target.value as any)}
+                        onBlur={handleSaveGeneral}
+                      >
+                        <option value="A">Curva A</option>
+                        <option value="B">Curva B</option>
+                        <option value="C">Curva C</option>
+                        <option value="D">Curva D</option>
+                      </select>
                     </div>
                   </div>
 
@@ -414,7 +465,7 @@ function ContactDrawer({
                           type="text" 
                           className="input" 
                           value={phone} 
-                          onChange={(e) => setPhone(e.target.value)}
+                          onChange={(e) => setPhone(formatPhoneBr(e.target.value))}
                           onBlur={handleSaveGeneral}
                         />
                       </div>
@@ -581,7 +632,7 @@ function NewContactModal({
   const [tradeName, setTradeName] = useState('')
   const [cnpj, setCnpj] = useState('')
   const [curve, setCurve] = useState<'A' | 'B' | 'C' | 'D'>('C')
-  const [representative, setRepresentative] = useState('Ana Lima')
+  const [representative] = useState('Ana Lima') // Default representative set in background
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [city, setCity] = useState('')
@@ -594,6 +645,7 @@ function NewContactModal({
   const [taxRegime, setTaxRegime] = useState<'MEI' | 'Simples Nacional' | 'Lucro Presumido' | 'Lucro Real'>('Simples Nacional')
   const [specialSituation, setSpecialSituation] = useState('Nenhuma')
   const [specialSituationDate, setSpecialSituationDate] = useState('-')
+  const [stateRegistration, setStateRegistration] = useState('')
 
   const handleFetchCnpj = async () => {
     const clean = rawCnpj.replace(/\D/g, '')
@@ -613,14 +665,17 @@ function NewContactModal({
       // Populating standard and expanded fields
       setCompany(data.razao_social || '')
       setTradeName(data.nome_fantasia || data.razao_social || '')
-      setPhone(data.ddd_telefone_1 || '')
+      setPhone(formatPhoneBr(data.ddd_telefone_1 || ''))
       setEmail(data.email || '')
       setCity(data.municipio ? capitalizeString(data.municipio) : '')
       setState(data.uf || '')
       setCnpj(formatCnpj(clean))
       
       // Auto-populate expanded API information
-      setRegistrationStatus(data.descricao_situacao_cadastral || 'ATIVA')
+      const statusText = data.descricao_situacao_cadastral || 'ATIVA'
+      const statusDateFormatted = data.data_situacao_cadastral ? formatDateBr(data.data_situacao_cadastral) : ''
+      setRegistrationStatus(statusDateFormatted ? `${statusText} desde ${statusDateFormatted}` : statusText)
+      
       setMainCnae(data.cnae_fiscal ? `${data.cnae_fiscal} - ${data.cnae_fiscal_descricao || ''}` : '')
       setAddress(buildAddress(data))
       
@@ -634,7 +689,8 @@ function NewContactModal({
       }
 
       setSpecialSituation(data.situacao_especial || 'Nenhuma')
-      setSpecialSituationDate(data.data_situacao_especial || '-')
+      setSpecialSituationDate(data.data_situacao_especial ? formatDateBr(data.data_situacao_especial) : '-')
+      setStateRegistration('') // Inscrição Estadual stays empty since it is state-level (SEFAZ)
       setName('') // Stay blank for manual physical person responsible name entry
     } catch (err) {
       setCnpjError('Erro ao buscar CNPJ. CNPJ inexistente ou API fora do ar.')
@@ -662,21 +718,27 @@ function NewContactModal({
       address,
       taxRegime,
       specialSituation,
-      specialSituationDate
+      specialSituationDate,
+      stateRegistration
     })
   }
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-      <form onSubmit={handleSubmit} className="bg-[var(--charcoal)] border border-[var(--line)] rounded-2xl p-6 w-full max-w-lg shadow-2xl flex flex-col gap-4 animate-fade-up">
+      <form onSubmit={handleSubmit} className="bg-[var(--charcoal)] border border-[var(--line)] rounded-2xl p-6 w-full max-w-5xl shadow-2xl flex flex-col gap-4 animate-fade-up">
         
-        <div>
-          <h3 className="font-display text-base text-[var(--white)] font-bold">Cadastrar Novo Cliente</h3>
-          <p className="text-xs text-[var(--gray)] mt-0.5">Insira o CNPJ da empresa para realizar o preenchimento automático das fichas fiscais.</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="font-display text-base text-[var(--white)] font-bold">Cadastrar Novo Cliente</h3>
+            <p className="text-xs text-[var(--gray)] mt-0.5">Insira o CNPJ da empresa para realizar o preenchimento automático das fichas fiscais.</p>
+          </div>
+          <button type="button" onClick={onCancel} className="text-gray-400 hover:text-[var(--white)] p-1 rounded-md hover:bg-[var(--line)] transition-colors">
+            <X size={18} />
+          </button>
         </div>
 
         {/* CNPJ Input Header */}
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1.5 max-w-md">
           <label className="label">Buscar CNPJ</label>
           <div className="flex gap-2">
             <input 
@@ -698,12 +760,12 @@ function NewContactModal({
           {cnpjError && <span className="text-[10px] text-[var(--red)] font-semibold">{cnpjError}</span>}
         </div>
 
-        {/* Scrollable Form Body */}
-        <div className="max-h-[60vh] overflow-y-auto pr-1 flex flex-col gap-5 border-t border-[var(--line)] pt-3">
+        {/* Desktop 3-column Layout without scroll, mobile scrolls */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 border-t border-[var(--line)] pt-4 max-h-[68vh] overflow-y-auto lg:overflow-y-visible">
           
           {/* SEC 1: IDENTIFICAÇÃO */}
-          <div>
-            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3">Dados Cadastrais</h4>
+          <div className="flex flex-col gap-4">
+            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1">Dados Cadastrais</h4>
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1.5">
                 <label className="label">Razão Social / Empresa *</label>
@@ -717,34 +779,32 @@ function NewContactModal({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Nome Fantasia</label>
-                  <input 
-                    type="text" 
-                    className="input" 
-                    placeholder="Nome Fantasia"
-                    value={tradeName}
-                    onChange={(e) => setTradeName(e.target.value)}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="label">Responsável (Pessoa Física) *</label>
-                  <input 
-                    type="text" 
-                    required
-                    className="input font-bold border-dashed border-[var(--lime)]" 
-                    placeholder="Nome do Contato Principal"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="label">Nome Fantasia</label>
+                <input 
+                  type="text" 
+                  className="input" 
+                  placeholder="Nome Fantasia"
+                  value={tradeName}
+                  onChange={(e) => setTradeName(e.target.value)}
+                />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="label">Responsável (Pessoa Física) *</label>
+                <input 
+                  type="text" 
+                  required
+                  className="input font-bold border-dashed border-[var(--lime)]" 
+                  placeholder="Nome do Contato Principal"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="label">CNPJ (Formatado)</label>
+                  <label className="label">CNPJ</label>
                   <input 
                     type="text" 
                     className="input font-mono" 
@@ -772,17 +832,17 @@ function NewContactModal({
           </div>
 
           {/* SEC 2: FISCAL */}
-          <div>
-            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3">Informações Fiscais e Tributárias</h4>
+          <div className="flex flex-col gap-4">
+            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1">Informações Fiscais</h4>
             <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <label className="label">Situação Cadastral</label>
                   <input 
                     type="text" 
-                    className="input" 
+                    className="input font-bold" 
                     placeholder="Ex: ATIVA"
-                    style={{ color: registrationStatus === 'ATIVA' ? 'var(--green)' : 'var(--white)' }}
+                    style={{ color: registrationStatus.includes('ATIVA') ? 'var(--green)' : 'var(--white)' }}
                     value={registrationStatus}
                     onChange={(e) => setRegistrationStatus(e.target.value)}
                   />
@@ -804,17 +864,28 @@ function NewContactModal({
               </div>
 
               <div className="flex flex-col gap-1.5">
+                <label className="label">Inscrição Estadual</label>
+                <input 
+                  type="text" 
+                  className="input font-mono" 
+                  placeholder="Preencher manualmente se houver"
+                  value={stateRegistration}
+                  onChange={(e) => setStateRegistration(e.target.value)}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
                 <label className="label">CNAE Principal</label>
                 <input 
                   type="text" 
-                  className="input" 
-                  placeholder="CNAE e Descrição da Atividade"
+                  className="input text-xs" 
+                  placeholder="CNAE e Descrição"
                   value={mainCnae}
                   onChange={(e) => setMainCnae(e.target.value)}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <label className="label">Situação Especial</label>
                   <input 
@@ -827,7 +898,7 @@ function NewContactModal({
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="label">Data da Situação Especial</label>
+                  <label className="label">Data Situação Especial</label>
                   <input 
                     type="text" 
                     className="input" 
@@ -841,10 +912,10 @@ function NewContactModal({
           </div>
 
           {/* SEC 3: ENDEREÇO & CONTATO */}
-          <div>
-            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] mb-3">Endereço e Contato</h4>
+          <div className="flex flex-col gap-4">
+            <h4 className="text-[10px] uppercase font-bold tracking-wider text-[var(--lime)] border-b border-[var(--line)] pb-1">Endereço e Contato</h4>
             <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <label className="label">Telefone</label>
                   <input 
@@ -852,7 +923,7 @@ function NewContactModal({
                     className="input" 
                     placeholder="(00) 00000-0000"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => setPhone(formatPhoneBr(e.target.value))}
                   />
                 </div>
 
@@ -879,7 +950,7 @@ function NewContactModal({
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2 flex flex-col gap-1.5">
                   <label className="label">Cidade</label>
                   <input 
@@ -902,16 +973,6 @@ function NewContactModal({
                     onChange={(e) => setState(e.target.value.toUpperCase())}
                   />
                 </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="label">Representante Associado</label>
-                <input 
-                  type="text" 
-                  className="input" 
-                  value={representative}
-                  onChange={(e) => setRepresentative(e.target.value)}
-                />
               </div>
             </div>
           </div>
@@ -1004,7 +1065,8 @@ export default function ContactsPage() {
       address: data.address || '',
       taxRegime: data.taxRegime || 'Simples Nacional',
       specialSituation: data.specialSituation || 'Nenhuma',
-      specialSituationDate: data.specialSituationDate || '-'
+      specialSituationDate: data.specialSituationDate || '-',
+      stateRegistration: data.stateRegistration || ''
     }
 
     setContacts(prev => [newContact, ...prev])
