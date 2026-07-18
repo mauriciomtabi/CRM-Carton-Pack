@@ -984,7 +984,7 @@ function NewContactModal({
 
                 {/* Map icon — bare lime icon, no border/bg */}
                 <a
-                  href={(address || city) ? `https://www.openstreetmap.org/search?query=${encodeURIComponent([address, bairro, city, state, cep].filter(Boolean).join(', '))}` : '#'}
+                  href={(address || city) ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([address, bairro, city, state, cep].filter(Boolean).join(', '))}` : '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   title="Ver endereço no mapa"
