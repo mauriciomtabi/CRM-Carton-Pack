@@ -20,9 +20,11 @@ import {
   Percent,
   FileSpreadsheet,
   ExternalLink,
-  Clock
+  Clock,
+  UserPlus
 } from 'lucide-react'
-import { whatsappLink, formatCurrency } from '@/lib/utils'
+import { whatsappLink, formatCurrency, formatCnaeCode, formatCnaeFullString } from '@/lib/utils'
+import { ProspeccaoModal } from '@/components/ProspeccaoModal'
 
 export interface MockContact {
   id: string
@@ -59,6 +61,38 @@ interface Activity {
 }
 
 const MOCK_CONTACTS: MockContact[] = [
+  { 
+    id: 'jle', 
+    name: 'Eduardo Rosa da Costa', 
+    company: 'J. L. E. TELECOMUNICACOES LTDA', 
+    cnpj: '26.469.930/0001-82', 
+    curve: 'A', 
+    representative: 'Ermínio', 
+    lastPurchaseDays: 12, 
+    phone: '(51) 8595-1002', 
+    city: 'São Leopoldo', 
+    state: 'RS', 
+    status: 'ativo', 
+    email: 'jle@jletelecom.com.br', 
+    tradeName: 'J. L. E. TELECOMUNICACOES LTDA', 
+    registrationStatus: 'Ativa desde 03/11/2016', 
+    mainCnae: '7112-0/00 - Serviços de engenharia', 
+    address: 'Avenida Imperatriz Leopoldina, 2244', 
+    bairro: 'Pinheiro',
+    cep: '93042-082',
+    taxRegime: 'Simples Nacional', 
+    specialSituation: 'Nenhuma', 
+    specialSituationDate: '-', 
+    stateRegistration: '1240323350',
+    sideActivities: [
+      { id: '4221-9/04', text: 'Construção de estações e redes de telecomunicações' },
+      { id: '4221-9/05', text: 'Manutenção de estações e redes de telecomunicações' },
+      { id: '4313-4/00', text: 'Obras de terraplenagem' },
+      { id: '4330-4/99', text: 'Outras obras de acabamento da construção' },
+      { id: '4391-6/00', text: 'Obras de fundações' },
+      { id: '4742-3/00', text: 'Comércio varejista de material elétrico' }
+    ]
+  },
   { 
     id: '1', 
     name: 'Alvaro Ferreira', 
@@ -719,8 +753,8 @@ function ContactDrawer({
                   <label className="text-[9px] font-bold text-[var(--gray2)] uppercase font-mono tracking-wider">CNAE Principal</label>
                   <input 
                     type="text" 
-                    className="input text-xs py-1.5" 
-                    value={mainCnae}
+                    className="input text-xs py-1.5 font-medium" 
+                    value={formatCnaeFullString(mainCnae)}
                     onChange={(e) => setMainCnae(e.target.value)}
                     onBlur={() => handleSaveGeneral()}
                   />
@@ -745,11 +779,11 @@ function ContactDrawer({
                       <div className="flex flex-col gap-0 border border-[var(--line)] rounded-lg overflow-hidden">
                         {sideActivities.map((act, i) => (
                           <div
-                            key={act.id}
+                            key={i}
                             className="flex gap-2 px-3 py-1.5 text-xs font-mono"
                             style={{ background: i % 2 === 0 ? 'var(--card2)' : 'transparent' }}
                           >
-                            <span className="text-[var(--lime)] font-bold shrink-0">{act.id}</span>
+                            <span className="text-[var(--lime)] font-bold shrink-0">{formatCnaeCode(act.id)}</span>
                             <span className="text-[var(--gray)]">{act.text}</span>
                           </div>
                         ))}
@@ -893,11 +927,12 @@ function NewContactModal({
       
       const mainCnaeId = data.mainActivity?.id
       const mainCnaeDesc = data.mainActivity?.text
-      setMainCnae(mainCnaeId ? `${mainCnaeId} - ${mainCnaeDesc || ''}` : '')
+      const formattedMainCode = formatCnaeCode(mainCnaeId)
+      setMainCnae(formattedMainCode ? `${formattedMainCode} - ${mainCnaeDesc || ''}` : '')
 
-      // Populate secondary activities
+      // Populate secondary activities with standard Receita Federal CNAE format (XXXX-X/XX)
       const sides = (data.sideActivities || []).map((a: any) => ({
-        id: String(a.id || ''),
+        id: formatCnaeCode(String(a.id || '')),
         text: a.text || ''
       }))
       setSideActivities(sides)
@@ -996,10 +1031,10 @@ function NewContactModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-      <form onSubmit={handleSubmit} className="bg-[var(--charcoal)] border border-[var(--line)] rounded-2xl p-6 w-full max-w-6xl shadow-2xl flex flex-col gap-4 animate-fade-up">
+      <form onSubmit={handleSubmit} className="bg-[var(--charcoal)] border border-[var(--line)] rounded-2xl w-full max-w-[95vw] xl:max-w-6xl shadow-2xl flex flex-col gap-4 animate-fade-up max-h-[95vh] overflow-hidden">
         
         {/* Header */}
-        <div className="flex justify-between items-start border-b border-[var(--line)] pb-3">
+        <div className="flex justify-between items-start border-b border-[var(--line)] pb-3 px-6 pt-6 shrink-0">
           <div>
             <h3 className="font-display text-base text-[var(--white)] font-bold">Cadastrar Novo Cliente</h3>
             <p className="text-xs text-[var(--gray)] mt-0.5 font-mono">Preenchimento automático inteligente integrado com a API do CNPJá e CNPJ.ws</p>
@@ -1010,11 +1045,11 @@ function NewContactModal({
         </div>
 
         {/* CNPJ Search Bar */}
-        <div className="flex items-center gap-3 bg-[var(--card)] border border-[var(--line)] p-2.5 rounded-xl max-w-md">
+        <div className="flex flex-wrap items-center gap-3 bg-[var(--card)] border border-[var(--line)] p-2.5 rounded-xl px-6">
           <label className="text-[10px] font-mono font-bold text-[var(--lime)] uppercase tracking-wider whitespace-nowrap">Buscar CNPJ:</label>
           <input 
             type="text" 
-            className="input font-mono bg-[var(--charcoal)] flex-1 text-xs py-1" 
+            className="input font-mono bg-[var(--charcoal)] flex-1 min-w-[140px] text-xs py-1" 
             placeholder="Ex: 00.000.000/0001-00"
             value={rawCnpj}
             onChange={(e) => setRawCnpj(formatCnpj(e.target.value))}
@@ -1028,10 +1063,10 @@ function NewContactModal({
             {loadingCnpj ? 'Buscando...' : 'Buscar'}
           </button>
         </div>
-        {cnpjError && <span className="text-[10px] text-[var(--red)] font-semibold -mt-2">{cnpjError}</span>}
+        {cnpjError && <span className="text-[10px] text-[var(--red)] font-semibold px-6">{cnpjError}</span>}
 
         {/* Dashboard 2-Column Split Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 border-t border-[var(--line)] pt-4 max-h-[64vh] overflow-y-auto pr-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 border-t border-[var(--line)] pt-4 overflow-y-auto flex-1 px-6 pb-6 pr-5">
           
           {/* LEFT COLUMN (2/3 width): Cadastral Info */}
           <div className="lg:col-span-2 flex flex-col gap-4 h-full">
@@ -1330,7 +1365,7 @@ function NewContactModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex justify-end gap-3 border-t border-[var(--line)] pt-3">
+        <div className="flex justify-end gap-3 border-t border-[var(--line)] px-6 py-4 shrink-0">
           <button 
             type="button" 
             onClick={onCancel}
@@ -1363,6 +1398,7 @@ export default function ContactsPage() {
   // Drawer / New Contact Modal states
   const [selectedContact, setSelectedContact] = useState<MockContact | null>(null)
   const [showNewContactModal, setShowNewContactModal] = useState(false)
+  const [showProspeccaoModal, setShowProspeccaoModal] = useState(false)
 
   // Dynamic representatives list from CRM Users in localStorage + default ones
   const [representativesList, setRepresentativesList] = useState<string[]>(['Ana Lima', 'Ermínio', 'Carlos Mendes'])
@@ -1488,24 +1524,34 @@ export default function ContactsPage() {
   return (
     <div className="page-content animate-fade-in w-full h-full flex flex-col gap-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="font-display text-2xl md:text-3xl text-[var(--white)] font-bold tracking-tight">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="font-display text-xl md:text-2xl text-[var(--white)] font-bold tracking-tight">
           Carteira de Clientes
         </h1>
 
-        <button onClick={() => setShowNewContactModal(true)} className="btn btn-primary btn-sm self-start md:self-auto">
-          <Plus size={14} />
-          <span>Novo Cliente</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowProspeccaoModal(true)}
+            className="btn btn-secondary text-xs py-2 px-4 flex items-center gap-2 cursor-pointer text-[var(--lime)] border-[var(--lime)]/30 hover:border-[var(--lime)] font-bold shadow-lg"
+          >
+            <UserPlus size={14} />
+            <span>Prospectar Novos Leads B2B</span>
+          </button>
+
+          <button onClick={() => setShowNewContactModal(true)} className="btn btn-primary text-xs py-2 px-4 flex items-center gap-2 cursor-pointer">
+            <Plus size={14} />
+            <span>Novo Cliente</span>
+          </button>
+        </div>
       </div>
 
       {/* Filters Bar */}
-      <div className="card p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Search */}
-        <div className="search-wrap">
-          <Search size={14} className="text-[var(--gray2)]" />
+      <div className="card p-4 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+        {/* Search — ocupa 2 colunas */}
+        <div className="md:col-span-2 flex items-center gap-2 input w-full">
+          <Search size={14} className="text-[var(--gray2)] shrink-0" />
           <input
-            className="search-input w-full"
+            className="bg-transparent border-none outline-none w-full text-sm text-[var(--white)] placeholder-[var(--gray2)]"
             placeholder="Buscar razão social, CNPJ..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -1728,6 +1774,26 @@ export default function ContactsPage() {
           </div>
         </div>
       )}
+
+      {/* ── Prospecção B2B Modal ── */}
+      <ProspeccaoModal
+        isOpen={showProspeccaoModal}
+        onClose={() => setShowProspeccaoModal(false)}
+        usuarioLogado={{ id: 'admin-1', nome: 'Supervisor Comercial', papel: 'supervisor', ativo: true }}
+        usuariosDisponiveis={[
+          { id: 'usr-1', nome: 'Ana Lima', papel: 'vendedor_interno', ativo: true },
+          { id: 'usr-2', nome: 'Ermínio', papel: 'representante', ativo: true },
+          { id: 'usr-3', nome: 'Carlos Mendes', papel: 'representante', ativo: true }
+        ]}
+        onLeadsImported={() => {
+          if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('crm_contacts')
+            if (saved) {
+              try { setContacts(JSON.parse(saved)) } catch (e) {}
+            }
+          }
+        }}
+      />
     </div>
   )
 }

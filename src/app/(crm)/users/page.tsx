@@ -59,6 +59,7 @@ export default function UsersPage() {
   // Modal states
   const [showModal, setShowModal] = useState(false)
   const [editingUser, setEditingUser] = useState<TeamUser | null>(null)
+  const [selectedUserForFicha, setSelectedUserForFicha] = useState<TeamUser | null>(null)
   
   // Form states
   const [name, setName] = useState('')
@@ -100,7 +101,7 @@ export default function UsersPage() {
   const saveUsers = (newUsers: TeamUser[]) => {
     setUsers(newUsers)
     if (typeof window !== 'undefined') {
-      localStorage.setItem('crm_users', JSON.stringify(newUsers))
+      localStorage.setItem('crm_users_v5_official', JSON.stringify(newUsers))
     }
   }
 
@@ -184,6 +185,10 @@ export default function UsersPage() {
           : u
       )
       saveUsers(updated)
+      const updatedUser = updated.find(u => u.id === editingUser.id)
+      if (updatedUser) {
+        setSelectedUserForFicha(updatedUser)
+      }
       setShowModal(false)
     } else {
       // Create mode
@@ -270,12 +275,9 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl md:text-3xl text-[var(--white)] font-bold tracking-tight">
+          <h1 className="font-display text-xl md:text-2xl text-[var(--white)] font-bold tracking-tight">
             Gestão de Equipe e Usuários
           </h1>
-          <p className="text-xs text-[var(--gray)] mt-1 font-mono">
-            Gerencie os membros da equipe de vendas, administradores e representantes comerciais autorizados.
-          </p>
         </div>
 
         <button onClick={handleOpenCreate} className="btn btn-primary btn-sm flex items-center gap-1.5 shrink-0 self-start md:self-auto">
@@ -345,7 +347,11 @@ export default function UsersPage() {
               {filteredUsers.map(user => {
                 const roleInfo = getRoleDetails(user.role)
                 return (
-                  <tr key={user.id} className="hover:bg-[var(--charcoal)] transition-colors duration-150">
+                  <tr 
+                    key={user.id} 
+                    onClick={() => setSelectedUserForFicha(user)}
+                    className="hover:bg-[var(--charcoal)] transition-colors duration-150 cursor-pointer"
+                  >
                     
                     {/* User Info */}
                     <td className="p-4 pl-6">
@@ -383,7 +389,10 @@ export default function UsersPage() {
                     {/* Status Toggle Dot */}
                     <td className="p-4 text-center">
                       <button 
-                        onClick={() => handleToggleStatus(user)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleToggleStatus(user)
+                        }}
                         title={`Clique para deixar o usuário ${user.status === 'ativo' ? 'inativo' : 'ativo'}`}
                         className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold border transition-all ${
                           user.status === 'ativo'
@@ -407,19 +416,17 @@ export default function UsersPage() {
                     </td>
 
                     {/* Actions */}
-                    <td className="p-4 pr-6 text-right">
+                    <td className="p-4 pr-6 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex justify-end gap-1.5">
                         <button
-                          onClick={() => handleOpenEdit(user)}
-                          title="Editar Usuário"
-                          className="btn btn-secondary p-2 hover:text-[var(--white)] rounded-lg transition-colors border-none"
-                        >
-                          <Edit2 size={13} />
-                        </button>
-                        
-                        <button
                           type="button"
-                          onClick={() => handleToggleStatus(user)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleToggleStatus(user)
+                            if (selectedUserForFicha?.id === user.id) {
+                              setSelectedUserForFicha(prev => prev ? { ...prev, status: prev.status === 'ativo' ? 'inativo' : 'ativo' } : null)
+                            }
+                          }}
                           title={user.status === 'ativo' ? 'Suspender Acesso' : 'Reativar Acesso'}
                           className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none self-center mx-1.5 ${
                             user.status === 'ativo' ? 'bg-[var(--lime)]' : 'bg-zinc-700'
@@ -430,14 +437,6 @@ export default function UsersPage() {
                               user.status === 'ativo' ? 'translate-x-4' : 'translate-x-0'
                             }`}
                           />
-                        </button>
-
-                        <button
-                          onClick={() => handleDelete(user.id)}
-                          title="Excluir Usuário"
-                          className="btn btn-secondary p-2 hover:text-[var(--red)] rounded-lg transition-colors border-none"
-                        >
-                          <Trash2 size={13} />
                         </button>
                       </div>
                     </td>
@@ -705,6 +704,7 @@ ${createdUserCredentials.type === 'cartonpack'
                     const updated = users.filter(u => u.id !== userToDelete)
                     saveUsers(updated)
                     setUserToDelete(null)
+                    setSelectedUserForFicha(null)
                     setToastMessage('Usuário excluído com sucesso!')
                     setTimeout(() => setToastMessage(''), 3000)
                   }
@@ -713,6 +713,155 @@ ${createdUserCredentials.type === 'cartonpack'
               >
                 Confirmar Exclusão
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* User Detail Drawer (Ficha do Usuário) */}
+      {selectedUserForFicha && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-black/75 backdrop-blur-sm transition-opacity" onClick={() => setSelectedUserForFicha(null)} />
+          
+          <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
+            <div className="w-screen max-w-md border-l border-[var(--line)] flex flex-col h-full bg-[var(--charcoal)] text-white shadow-2xl animate-slide-in-right">
+              
+              {/* Drawer Header */}
+              <div className="p-6 border-b border-[var(--line)] flex items-center justify-between bg-[var(--card)]">
+                <div>
+                  <h3 className="text-xl font-bold font-display text-white">
+                    {selectedUserForFicha.name}
+                  </h3>
+                  <div className="mt-2">
+                    {(() => {
+                      const roleInfo = getRoleDetails(selectedUserForFicha.role)
+                      return (
+                        <span
+                          className="font-mono text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider inline-block"
+                          style={{
+                            background: roleInfo.bg,
+                            color: roleInfo.color,
+                            border: `1px solid ${roleInfo.border}`
+                          }}
+                        >
+                          {roleInfo.label}
+                        </span>
+                      )
+                    })()}
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setSelectedUserForFicha(null)} 
+                  className="p-1.5 rounded-full bg-[var(--black)] border border-[var(--line)] hover:border-[var(--lime)] text-[var(--gray)] hover:text-white cursor-pointer transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Drawer Body */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+
+
+                {/* Contact and Status Info */}
+                <div className="card p-5 border-[var(--line)] bg-[var(--card)] space-y-4">
+                  <h4 className="text-[10px] font-mono uppercase font-bold text-[var(--gray)] tracking-widest border-b border-[var(--line)] pb-2">
+                    Detalhes de Contato & Acesso
+                  </h4>
+                  
+                  <div className="flex items-center gap-3">
+                    <Phone size={14} className="text-[var(--lime)]" />
+                    <div>
+                      <div className="text-[9px] text-[var(--gray2)] uppercase font-mono">WhatsApp / Telefone</div>
+                      <div className="text-sm font-semibold text-[var(--white)]">{selectedUserForFicha.phone || 'Não informado'}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Mail size={14} className="text-[var(--lime)]" />
+                    <div>
+                      <div className="text-[9px] text-[var(--gray2)] uppercase font-mono">E-mail Comercial</div>
+                      <div className="text-sm font-semibold text-[var(--white)]">{selectedUserForFicha.email}</div>
+                    </div>
+                  </div>
+
+                  {selectedUserForFicha.username && (
+                    <div className="flex items-center gap-3">
+                      <User size={14} className="text-[var(--lime)]" />
+                      <div>
+                        <div className="text-[9px] text-[var(--gray2)] uppercase font-mono">Nome de Usuário</div>
+                        <div className="text-sm font-semibold text-[var(--white)] font-mono">{selectedUserForFicha.username}</div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3">
+                    <Clock size={14} className="text-[var(--lime)]" />
+                    <div>
+                      <div className="text-[9px] text-[var(--gray2)] uppercase font-mono">Cadastrado em</div>
+                      <div className="text-sm font-semibold text-[var(--white)] font-mono">{selectedUserForFicha.createdAt}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Account Status Card */}
+                <div className="card p-5 border-[var(--line)] bg-[var(--card)] space-y-4">
+                  <h4 className="text-[10px] font-mono uppercase font-bold text-[var(--gray)] tracking-widest border-b border-[var(--line)] pb-2">
+                    Status da Conta
+                  </h4>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-[9px] text-[var(--gray2)] uppercase font-mono">Acesso ao Sistema</div>
+                      <div className="text-xs text-[var(--white)] font-semibold mt-0.5">
+                        {selectedUserForFicha.status === 'ativo' ? 'Autorizado' : 'Suspenso'}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleToggleStatus(selectedUserForFicha)
+                        setSelectedUserForFicha(prev => prev ? { ...prev, status: prev.status === 'ativo' ? 'inativo' : 'ativo' } : null)
+                      }}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        selectedUserForFicha.status === 'ativo' ? 'bg-[var(--lime)]' : 'bg-zinc-700'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                          selectedUserForFicha.status === 'ativo' ? 'translate-x-5' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {selectedUserForFicha.tempPassword && (
+                    <div className="p-3 bg-[var(--black)] border border-[var(--line)] rounded-xl space-y-1">
+                      <div className="text-[9px] text-[var(--gray2)] uppercase font-mono">Senha Temporária de Acesso</div>
+                      <div className="text-xs font-mono font-bold text-[var(--lime)]">{selectedUserForFicha.tempPassword}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Drawer Footer Actions (EDIT and DELETE only here as requested!) */}
+              <div className="p-5 border-t border-[var(--line)] bg-[var(--black)] flex justify-between gap-3">
+                <button 
+                  onClick={() => {
+                    handleDelete(selectedUserForFicha.id)
+                  }}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--red)]/25 bg-[var(--red)]/8 text-[var(--red)] text-xs font-bold hover:bg-[var(--red)]/15 transition-all cursor-pointer"
+                >
+                  <Trash2 size={13} /> Excluir Usuário
+                </button>
+                
+                <button 
+                  onClick={() => handleOpenEdit(selectedUserForFicha)}
+                  className="btn btn-primary flex items-center gap-2 text-xs py-2.5 px-6 rounded-xl cursor-pointer text-black"
+                >
+                  <Edit2 size={13} /> Editar Dados
+                </button>
+              </div>
+
             </div>
           </div>
         </div>

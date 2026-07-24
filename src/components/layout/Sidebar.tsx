@@ -22,8 +22,6 @@ const navItems = [
   { href: '/contacts',   label: 'Contatos',     icon: Users },
   { href: '/users',      label: 'Usuários',     icon: UserCog },
   { href: '/briefings',  label: 'Orçamentos',   icon: FileText },
-  { href: '/reports',    label: 'Relatórios',   icon: BarChart3 },
-  { href: '/settings',   label: 'Configurações',icon: Settings },
 ]
 
 export function Sidebar() {
@@ -48,7 +46,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar hidden lg:flex">
       {/* Logo */}
       <div className="sidebar-logo">
         <div className="sidebar-logo-icon">

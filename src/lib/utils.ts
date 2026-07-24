@@ -53,3 +53,44 @@ export function whatsappLink(phone: string, message?: string): string {
   const msg = message ? `?text=${encodeURIComponent(message)}` : ''
   return `https://wa.me/55${clean}${msg}`
 }
+
+/**
+ * Formata qualquer código CNAE no padrão oficial da Receita Federal / IBGE:
+ * 7 dígitos: 7112000 -> 7112-0/00
+ * 5 dígitos: 71120 -> 7112-0
+ * Caso já esteja no padrão (ex: 7112-0/00), mantém inalterado.
+ */
+export function formatCnaeCode(raw: string | number | undefined | null): string {
+  if (!raw) return ''
+  const str = String(raw).trim()
+  const matchPrefix = str.match(/^([A-Z]-)/i)
+  const prefix = matchPrefix ? matchPrefix[1].toUpperCase() : ''
+  const cleanStr = str.replace(/^[A-Z]-/i, '')
+  const digits = cleanStr.replace(/\D/g, '')
+
+  if (digits.length === 7) {
+    return `${prefix}${digits.slice(0, 4)}-${digits.slice(4, 5)}/${digits.slice(5, 7)}`
+  }
+  if (digits.length === 5) {
+    return `${prefix}${digits.slice(0, 4)}-${digits.slice(4, 5)}`
+  }
+  if (digits.length === 4) {
+    return `${prefix}${digits.slice(0, 4)}`
+  }
+  return str
+}
+
+/**
+ * Formata strings completas de CNAE (ex: "7112000 - Serviços de engenharia")
+ * Retornando o código formatado no padrão oficial da Receita Federal: "7112-0/00 - Serviços de engenharia"
+ */
+export function formatCnaeFullString(raw: string | undefined | null): string {
+  if (!raw) return ''
+  const str = String(raw).trim()
+  if (str.includes(' - ')) {
+    const parts = str.split(' - ')
+    const formattedCode = formatCnaeCode(parts[0])
+    return `${formattedCode} - ${parts.slice(1).join(' - ')}`
+  }
+  return formatCnaeCode(str)
+}

@@ -35,6 +35,10 @@
   --text-muted:     var(--gray2);
   --brand:          var(--lime);
 
+  /* ── Chart visual overrides ── */
+  --chart-track:    #121212;
+  --chart-border:   #2a2a2a;
+
   /* ── Opacidades e Hovers Semânticos ── */
   --opacity-hover:          rgba(255, 255, 255, 0.04);
   --opacity-hover-heavy:    rgba(255, 255, 255, 0.08);
@@ -68,10 +72,14 @@
   --charcoal:  #ffffff;
   --card:      #ffffff;
   --card2:     #f1f5f9;
-  --line:      #e2e8f0;
+  --line:      #cbd5e1;
   --white:     #0f172a;
-  --gray:      #475569;
-  --gray2:     #94a3b8;
+  --gray:      #334155;
+  --gray2:     #57606a;
+
+  /* ── Chart visual overrides (Light) ── */
+  --chart-track:    #f1f5f9;
+  --chart-border:   #cbd5e1;
 
   /* High-contrast brand colors for light backgrounds */
   --lime:      #769602;   /* Rich olive-lime green */
@@ -81,6 +89,17 @@
   --green:     #15803d;   /* Forest green */
   --yellow:    #a16207;   /* Amber gold */
   --red:       #b91c1c;   /* Crimson red */
+
+  /* Stage-specific colors optimized for light mode contrast */
+  --stage-leads:      #475569;
+  --stage-prospect:   #1d4ed8;
+  --stage-dinamica:   #6d28d9;
+  --stage-potencial:  #a16207;
+  --stage-visita:     #0e7490;
+  --stage-briefing:   #c2410c;
+  --stage-aprovacao:  #7e22ce;
+  --stage-fechamento: #15803d;
+  --stage-perdido:    #b91c1c;
 
   --opacity-hover:          rgba(15, 23, 42, 0.04);
   --opacity-hover-heavy:    rgba(15, 23, 42, 0.08);
@@ -96,10 +115,35 @@
   --shadow-lime:  0 8px 32px rgba(118, 150, 2, 0.15);
 }
 
+[data-theme="light"] .btn-primary {
+  color: #ffffff;
+}
+
+[data-theme="light"] select.input option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+
 /* ══════════════ RESET ══════════════ */
 *, *::before, *::after {
   box-sizing: border-box;
 }
+
+/* Leaflet Custom Pin Overrides */
+.clear-custom-pin {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Custom styling for map tiles */
+.leaflet-tile {
+  filter: none !important;
+}
+[data-theme="light"] .leaflet-tile {
+  filter: none !important;
+}
+
 
 html, body {
   height: 100%;
@@ -154,7 +198,8 @@ a, button, input, select, textarea {
   height: 100vh;
   overflow: hidden;
   position: relative;
-  z-index: 1;
+  /* NOTE: no z-index here — adding z-index would create an isolated stacking context
+     that traps modal z-indexes inside it, causing fixed modals to appear behind the sidebar */
 }
 
 /* ══════════════ SIDEBAR ══════════════ */
@@ -167,8 +212,14 @@ a, button, input, select, textarea {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  z-index: 20;
+  z-index: 10;
   overflow: hidden;
+}
+
+@media (max-width: 1023px) {
+  .sidebar {
+    display: none !important;
+  }
 }
 
 /* Logo */
@@ -295,6 +346,14 @@ a, button, input, select, textarea {
   flex-direction: column;
   overflow: hidden;
   background: var(--black);
+  position: relative;
+  z-index: 30;
+}
+
+@media (max-width: 1023px) {
+  .main-content {
+    padding-bottom: 64px !important;
+  }
 }
 
 /* ══════════════ TOPBAR ══════════════ */

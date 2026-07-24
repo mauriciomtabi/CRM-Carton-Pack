@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -22,6 +22,7 @@ import { Deal, DealStage, STAGE_CONFIG, FOLLOW_UP_LOST_REASONS } from '@/types'
 import { formatCurrency, daysSince } from '@/lib/utils'
 import { Plus, Clock, Trophy, XCircle, Search, Filter } from 'lucide-react'
 import { DealDrawer } from './DealDrawer'
+import { getPipelineDeals, savePipelineDeals } from '@/services/pipeline-service'
 
 // ─── Mock data ────────────────────────────────────────────────
 const MOCK_DEALS: Deal[] = [
@@ -379,8 +380,32 @@ function NewDealModal({
 
 // ─── Main Board ───────────────────────────────────────────────
 export function PipelineBoard() {
-  const [deals, setDeals] = useState<Deal[]>(MOCK_DEALS)
+  const [deals, setDeals] = useState<Deal[]>(() => getPipelineDeals(MOCK_DEALS))
+
+  useEffect(() => {
+    const syncDeals = () => updateAndSaveDeals(getPipelineDeals(MOCK_DEALS))
+    window.addEventListener('storage-deals-changed', syncDeals)
+    window.addEventListener('storage', syncDeals)
+    return () => {
+      window.removeEventListener('storage-deals-changed', syncDeals)
+      window.removeEventListener('storage', syncDeals)
+    }
+  }, [])
+
+  const updateAndSaveDeals = (updater: Deal[] | ((prev: Deal[]) => Deal[])) => {
+    updateAndSaveDeals(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      savePipelineDeals(next)
+      return next
+    })
+  }
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  // @dnd-kit uses a global counter for aria-describedby IDs that differs between
+  // SSR and client, causing a hydration mismatch. Rendering the DndContext only
+  // after mount eliminates the discrepancy entirely.
+  useEffect(() => { setMounted(true) }, [])
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null)
 
   // Modals state
@@ -423,7 +448,7 @@ export function PipelineBoard() {
 
     // Drop on Won zone
     if (over.id === 'drop-zone-pos_venda') {
-      setDeals(prev => prev.map(d =>
+      updateAndSaveDeals(prev => prev.map(d =>
         d.id === draggedDeal.id
           ? { ...d, stage: 'pos_venda', stage_entered_at: new Date().toISOString() }
           : d
@@ -444,7 +469,7 @@ export function PipelineBoard() {
 
     if (!newStage || newStage === draggedDeal.stage) return
 
-    setDeals(prev => prev.map(d =>
+    updateAndSaveDeals(prev => prev.map(d =>
       d.id === draggedDeal.id
         ? { ...d, stage: newStage, stage_entered_at: new Date().toISOString() }
         : d
@@ -452,7 +477,7 @@ export function PipelineBoard() {
   }
 
   function handleUpdateDeal(updatedDeal: Deal) {
-    setDeals(prev => prev.map(d => d.id === updatedDeal.id ? updatedDeal : d))
+    updateAndSaveDeals(prev => prev.map(d => d.id === updatedDeal.id ? updatedDeal : d))
     setSelectedDeal(updatedDeal)
   }
 
@@ -481,13 +506,13 @@ export function PipelineBoard() {
       updated_at: new Date().toISOString()
     }
 
-    setDeals(prev => [newDeal, ...prev])
+    updateAndSaveDeals(prev => [newDeal, ...prev])
     setShowNewDealModal(false)
   }
 
   const handleConfirmLost = (reason: string, notes: string) => {
     if (!lostModalDeal) return
-    setDeals(prev => prev.map(d =>
+    updateAndSaveDeals(prev => prev.map(d =>
       d.id === lostModalDeal.id
         ? { 
             ...d, 
@@ -505,7 +530,7 @@ export function PipelineBoard() {
     <div className="page-content animate-fade-in w-full h-full flex flex-col gap-4 overflow-hidden">
       {/* Page Header */}
       <div className="flex items-center justify-between gap-4">
-        <h1 className="font-display text-2xl md:text-3xl text-[var(--white)] font-bold tracking-tight">
+        <h1 className="font-display text-xl md:text-2xl text-[var(--white)] font-bold tracking-tight">
           Pipeline de Vendas
         </h1>
 
@@ -527,33 +552,65 @@ export function PipelineBoard() {
         </div>
       </div>
 
-      {/* Board */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
+      {/* Board — rendered client-side only to avoid @dnd-kit aria-describedby hydration mismatch */}
+      {mounted ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="pipeline-wrap">
+            <div className="kanban-board">
+              {activeStages.map(stage => (
+                <KanbanColumn 
+                  key={stage} 
+                  stage={stage} 
+                  deals={dealsByStage[stage]} 
+                  onCardClick={setSelectedDeal}
+                  onAddDeal={handleOpenAddDeal}
+                />
+              ))}
+            </div>
+          </div>
+
+          <DragOverlay>
+            {activeDeal && <DealCard deal={activeDeal} overlay />}
+          </DragOverlay>
+
+          <BottomDropZones activeId={activeId} />
+        </DndContext>
+      ) : (
+        /* SSR skeleton — DndContext (with icon components) only runs client-side */
         <div className="pipeline-wrap">
           <div className="kanban-board">
-            {activeStages.map(stage => (
-              <KanbanColumn 
-                key={stage} 
-                stage={stage} 
-                deals={dealsByStage[stage]} 
-                onCardClick={setSelectedDeal}
-                onAddDeal={handleOpenAddDeal}
-              />
-            ))}
+            {activeStages.map(stage => {
+              const cfg = STAGE_CONFIG[stage]
+              const Icon = cfg.icon as React.ElementType
+              return (
+                <div key={stage} className="kanban-col" style={{ '--col-color': cfg.color } as React.CSSProperties}>
+                  <div className="kanban-col-header">
+                    <span className="kanban-col-icon"><Icon size={14} /></span>
+                    <div className="kanban-col-info">
+                      <div className="kanban-col-title">{cfg.label}</div>
+                    </div>
+                    <div className="kanban-col-count" style={{ color: cfg.color, background: cfg.color + '15' }}>
+                      {dealsByStage[stage]?.length ?? 0}
+                    </div>
+                  </div>
+                  <div className="kanban-cards">
+                    {dealsByStage[stage]?.map(deal => (
+                      <div key={deal.id} className="deal-card">
+                        <div className="deal-title">{deal.title}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
-
-        <DragOverlay>
-          {activeDeal && <DealCard deal={activeDeal} overlay />}
-        </DragOverlay>
-
-        <BottomDropZones activeId={activeId} />
-      </DndContext>
+      )}
 
       {/* Deal Detail Drawer */}
       <DealDrawer
